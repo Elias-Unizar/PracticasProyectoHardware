@@ -1,15 +1,15 @@
+;Lo de import a√∫n no lo he hecho, esta tarde me pongo con ello y lo soluciono, si lo haces t√∫, avisa
 
 
-
-AREA codigo, CODE, READWRITE ; ·rea de cÛdigo
+AREA codigo, CODE, READWRITE ; √°rea de c√≥digo
 	ENTRY
-							; Los argumentos tomar·n los registros de r0 a r7 (8 argumentos de la funciÛn, no meter en pila)
-	ldr r0, 				; Mover direcciÛn input
-	ldr r1, 				; Mover direcciÛn pesos
-	ldr r2, 				; Mover direcciÛn bias
-	ldr r3, 				; Mover direcciÛn output
-	ldr r4, 				; Mover tamaÒo input
-	ldr r5, 				; Mover tamaÒo output
+							; Los argumentos tomar√°n los registros de r0 a r7 (8 argumentos de la funci√≥n, no meter en pila)
+	ldr r0, 				; Mover direcci√≥n input
+	ldr r1, 				; Mover direcci√≥n pesos
+	ldr r2, 				; Mover direcci√≥n bias
+	ldr r3, 				; Mover direcci√≥n output
+	ldr r4, 				; Mover tama√±o input
+	ldr r5, 				; Mover tama√±o output
 	ldr r6, 				; Mover clamp_min
 	ldr r7, 				; Mover clamp_max
 	bl dense_layer			;Llevamos a subrutina
@@ -25,9 +25,9 @@ buc
 	beq finbuc
 	mul r10, r9, r4			;Ponemos de forma auxiliar el "offset" para cargar las distintas filas de la matriz de pesos
 	ldr r10, [r1, r10]		;Cargamos la direccion inicial de pesos
-							; Hacer llamada a neuron_12_C, no sÈ como hacerlo xd, cargar el resultado en r11
+							; Hacer llamada a neuron_12_C, no s√© como hacerlo xd, cargar el resultado en r11
 	str r11, [r3, r9]		; Metemos el resultado de y en el output correspondiente
-	mul r8, #33, r8			;Multiplicamos por 33, quiz· esta linea hay que corregir
+	mul r8, #33, r8			;Multiplicamos por 33, quiz√° esta linea hay que corregir
 	add r8, r8, r11			;sumamos para tener el resultado parcial de checksum
 	b buc
 fin buc

@@ -1,20 +1,21 @@
-AREA codigo, CODE, READONLY
-EXPORT  dense_layer_q12_ARM
-IMPORT  neuron_q12_ARM
+	AREA codigo, CODE, READONLY
+	EXPORT  dense_layer_q12_ARM
+	IMPORT  neuron_q12_ARM
 	
 dense_layer_q12_ARM							
 	PUSH {r4-r11, lr}		; Añadiremos en pila desde r4 a r7 los valores de los registros parámetro (r0-r3), el resto de parámetros que no caben entre r0 y r3 y las variables checksum y o 
+	sub sp, sp, #4			; Añadir a memoria, esto se hace para alinear el sp a 8 bytes porque la función en c lo exige
 	mov r4, r0              ; input
     mov r5, r1          	; weights
     mov r6, r2              ; bias
     mov r7, r3              ; output
-    ldr r8, [sp, #36]       ; input_size
-    ldr r9, [sp, #40]       ; output_size
+    ldr r8, [sp, #40]       ; input_size
+    ldr r9, [sp, #44]       ; output_size
     mov r10, #0             ; o = 0
     mov r11, #0             ; checksum = 0
-	ldr r0, [sp, #48]		; r0=clamp_max
+	ldr r0, [sp, #52]		; r0=clamp_max
 	str r0, [sp, #-4]!		; clamp_max se almacena en sp, sp empuja a la direccion original de sp
-	ldr r0, [sp, #48]		; r0=clamp_min
+	ldr r0, [sp, #52]		; r0=clamp_min
 	str r0, [sp, #-4]!		; clamp_min se almacena en sp, sp empuja a la direccion original de sp
 buc	
 	cmp r9, r10
@@ -38,6 +39,7 @@ buc
 finbuc
 	add sp, sp, #8			;"Desapilamos" los clamps de neuron
 	mov r0, r11				; Devuelve el resultado de checksum en r0, como es un argumento a punto de salir se puede machacar el resultado de r0
+	add sp, sp, #4
 	POP {r4-r11, pc}
 	
 	END

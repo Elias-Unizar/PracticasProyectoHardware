@@ -1,8 +1,8 @@
-AREA codigo, CODE, READONLY
-EXPORT neuron_q12_ARM
+	AREA codigo, CODE, READONLY
+	EXPORT neuron_q12_ARM
 	
 neuron_q12_ARM
-	PUSH {r4-r9, lr}
+	PUSH {r4-r10, lr}
 	mov r4, r0 				; input
 	mov r5, r1 				; weights
 	mov r6, r2 				; n
@@ -27,7 +27,7 @@ finbuc
     movlt   r0, r1          ; if (x < clamp_min) x = clamp_min
     cmp     r0, r2
     movgt   r0, r2          ; if (x > clamp_max) x = clamp_max
-	POP {r4-r9, pc}
+	POP {r4-r10, pc}
 	END
 	
 	

@@ -2,7 +2,7 @@ AREA codigo, CODE, READONLY
 EXPORT neuron_q12_ARM
 	
 neuron_q12_ARM
-	PUSH {r4-r11, lr}
+	PUSH {r4-r9, lr}
 	mov r4, r0 				; input
 	mov r5, r1 				; weights
 	mov r6, r2 				; n
@@ -12,22 +12,22 @@ neuron_q12_ARM
 buc
 	cmp r9, r6
 	beq finbuc
-	mov r12, r9, LSL #1 	; Alineamos a palabras de 2 bytes (ya que input y weitghts son uint16_t
-	ldrsh r0, [r4, r12]		; input[i]
+	mov r10, r9, LSL #1 	; Alineamos a palabras de 2 bytes (ya que input y weitghts son uint16_t)
+	ldrsh r0, [r4, r10]		; input[i]
 	ldrsh r1, [r5, r12]		; weights[i]
-	mla r8, r0, r1, r8		; acc += (int32_t)input[i] * (int32_t)weights[i], a馻dir en memoria, porque se puede disgregar en un mul y un add
-	add r9, r9, #1
+	mla r8, r0, r1, r8		; acc += (int32_t)input[i] * (int32_t)weights[i], a帽adir en memoria, porque se puede disgregar en un mul y un add
+	add r9, r9, #1			; i++
 	b buc
 finbuc
-	mov r0, r8, ASR #12		; int32_t result_q12 = acc >> Q_SHIFT, guardamos el resultado de la acumulaci髇 y lo volvemos a convertir en un Q12
+	mov r0, r8, ASR #12		; int32_t result_q12 = acc >> Q_SHIFT, guardamos el resultado de la acumulaci贸n y lo volvemos a convertir en un Q12
 	ldr r1, [sp, #36]		; r1 recibe el parametro clamp_min
 	ldr r2, [sp, #40]		; r2 recibe el parametro clamp_max
-							; No se llama a la funci髇 de saturaci髇 ya que la funci髇 de saturaci髇 es un static y no se pueden llamar desde otro fichero (static otorga encapsulamiento)
+							; No se llama a la funci贸n de saturaci贸n ya que la funci贸n de saturaci贸n es un static y no se pueden llamar desde otro fichero (static otorga encapsulamiento)
 	cmp     r0, r1
     movlt   r0, r1          ; if (x < clamp_min) x = clamp_min
     cmp     r0, r2
     movgt   r0, r2          ; if (x > clamp_max) x = clamp_max
-	POP {r4-r11, pc}
+	POP {r4-r9, pc}
 	END
 	
 	

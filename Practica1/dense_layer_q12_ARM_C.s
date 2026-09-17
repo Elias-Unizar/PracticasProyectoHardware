@@ -1,8 +1,8 @@
-AREA codigo, CODE, READONLY
-EXPORT  dense_layer_q12_ARM
-IMPORT  neuron_q12_ARM
+	AREA codigo, CODE, READONLY
+	EXPORT  dense_layer_q12_ARM_C
+	IMPORT  neuron_q12_C
 	
-dense_layer_q12_ARM							
+dense_layer_q12_ARM_C							
 	PUSH {r4-r11, lr}		; Añadiremos en pila desde r4 a r7 los valores de los registros parámetro (r0-r3), el resto de parámetros que no caben entre r0 y r3 y las variables checksum y o 
 	mov r4, r0              ; input
     mov r5, r1          	; weights
@@ -26,7 +26,7 @@ buc
     ldrsh r3, [r6, r12]     ; r3 = bias[o], para neuron
 	mov r0, r4				; r0=input (primer argumento de neuron)
 	mov r2, r8				; r2=input_size (tercer argumento de neuron)
-	bl neuron_q12_ARM
+	bl neuron_q12_C
 	mov r12, r10, LSL #1
 	strh r0, [r7, r12]		; output[o] = y
 	add r11, r11, r11, LSL #5	; checksum=checksum*33u (añadir a memoria que hay otra solucion (mul r11, #33, r11)

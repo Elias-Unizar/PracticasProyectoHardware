@@ -1,4 +1,10 @@
-	PRESERVE8
+; Traducción de dense_layer_C, recibe como parámetros const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *output, uint16_t input_size, uint16_t output_size, int16_t clamp_min, int16_t clamp_max
+; al igual que la función original en C, solo que en formato "half word" para datos de 16 bits (2 bytes).
+; Los primeros 4 argumentos se guardan en los registros r0-r3, el resto de parámetros se guardan en pila.
+; Registros utilizados: r0-r3, registros de tipo "argumento" los cuales pueden ser tanto los argumentos const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *output
+; como los "clamps" o la variable "y", el registro r4 es una copia del parametro input, r5 de weights, r6 de bias, r7 de output, r8 de input_size, r9 de output_size,
+; r10 es la variable del bucle "o", r11 es la variable checksum y r12 es una variable temporal, que sirve tanto para calcular o * input_size * 2 como para o * 2.
+; r13 (sp) es el puntero a pila, r14 (lr) es el link register, esencial para tener la dirección de retorno en suburtinas
 	AREA codigo, CODE, READONLY
 	EXPORT  dense_layer_q12_ARM_C
 	IMPORT  neuron_q12_C

@@ -1,3 +1,10 @@
+; Traducción de neuron_q12_C, recibe como parámetros const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *output, uint16_t input_size, uint16_t output_size, int16_t clamp_min, int16_t clamp_max
+; al igual que la función original en C, solo que en formato "half word" para datos de 16 bits (2 bytes).
+; Los primeros 4 argumentos se guardan en los registros r0-r3, el resto de parámetros se guardan en pila.
+; Registros utilizados: r0-r3, registros de tipo "argumento" los cuales pueden ser tanto los argumentos const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *output
+; como result en el caso de r0 o los clamps en los casos de r1 y r2, r4 es una copia de input, r5 es una copia de weights, r6 de n y r7 de bias, r8 es la variable acc,
+; r9 es la variable i del bucle, r10 es una variable para alinear las direcciones de input a 2 bytes (halfword), r13 (sp) es el puntero a la cima de la pila, r14 (lr) guarda la dirección de retorno de la subrutina.
+
 	AREA codigo, CODE, READONLY
 	EXPORT neuron_q12_ARM
 	

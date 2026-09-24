@@ -8,9 +8,12 @@
 	AREA codigo, CODE, READONLY
 	EXPORT  dense_layer_q12_ARM_C
 	IMPORT  neuron_q12_C
+	PRESERVE8
 	
-dense_layer_q12_ARM_C							
-	PUSH {r4-r11, lr}		; Añadiremos en pila desde r4 a r7 los valores de los registros parámetro (r0-r3), el resto de parámetros que no caben entre r0 y r3 y las variables checksum y o 
+dense_layer_q12_ARM_C	
+	mov r12, SP
+	PUSH {r4-r11, r12, sp, lr}		; Añadiremos en pila desde r4 a r7 los valores de los registros parámetro (r0-r3), el resto de parámetros que no caben entre r0 y r3 y las variables checksum y o 
+	sub r11, r12, #4
 	sub sp, sp, #4			; Añadir a memoria, esto se hace para alinear el sp a 8 bytes porque la función en c lo exige
 	mov r4, r0              ; input
     mov r5, r1          	; weights
@@ -47,7 +50,7 @@ finbuc
 	add sp, sp, #8			;"Desapilamos" los clamps de neuron
 	mov r0, r11				; Devuelve el resultado de checksum en r0, como es un argumento a punto de salir se puede machacar el resultado de r0
 	add  sp, sp, #4        ; quitar el relleno
-	POP {r4-r11, pc}
+	LDMDB r11, {r4-r11, r12, sp ,pc}
 	
 	END
 	

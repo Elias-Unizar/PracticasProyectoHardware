@@ -1,0 +1,12 @@
+--cpu ARM7TDMI
+".\objects\startup.o"
+".\objects\main.o"
+".\objects\dense_q12_stubs.o"
+".\objects\dense_layer_q12_arm.o"
+".\objects\dense_layer_q12_arm_c.o"
+".\objects\dense_layer_q12_thb.o"
+".\objects\neuron_q12_arm.o"
+".\objects\neuron_q12_thb.o"
+--ro-base 0x00000000 --entry 0x00000000 --rw-base 0x40000000 --strict --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\neuron_q12.map" -o .\Objects\neuron_q12.axf

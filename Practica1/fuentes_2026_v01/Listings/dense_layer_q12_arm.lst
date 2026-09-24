@@ -1,0 +1,194 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; Traducción de dense_layer_C, recibe como parámetros 
+                       const int16_t *input, const int16_t *weights, const int1
+                       6_t *bias, int16_t *output, uint16_t input_size, uint16_
+                       t output_size, int16_t clamp_min, int16_t clamp_max
+    2 00000000         ; al igual que la función original en C, solo que en fo
+                       rmato "half word" para datos de 16 bits (2 bytes).
+    3 00000000         ; Los primeros 4 argumentos se guardan en los registros 
+                       r0-r3, el resto de parámetros se guardan en pila.
+    4 00000000         ; Registros utilizados: r0-r3, registros de tipo "argume
+                       nto" los cuales pueden ser tanto los argumentos const in
+                       t16_t *input, const int16_t *weights, const int16_t *bia
+                       s, int16_t *output
+    5 00000000         ; como los "clamps" o la variable "y", el registro r4 es
+                        una copia del parametro input, r5 de weights, r6 de bia
+                       s, r7 de output, r8 de input_size, r9 de output_size,
+    6 00000000         ; r10 es la variable del bucle "o", r11 es la variable c
+                       hecksum y r12 es una variable temporal, que sirve tanto 
+                       para calcular o * input_size * 2 como para o * 2.
+    7 00000000         ; r13 (sp) es el puntero a pila, r14 (lr) es el link reg
+                       ister, esencial para tener la dirección de retorno en s
+                       uburtinas
+    8 00000000                 AREA             codigo, CODE, READONLY
+    9 00000000                 EXPORT           dense_layer_q12_ARM
+   10 00000000                 IMPORT           neuron_q12_ARM
+   11 00000000         
+   12 00000000         dense_layer_q12_ARM
+   13 00000000 E92D4FF0        PUSH             {r4-r11, lr} ; Añadiremos en p
+                                                            ila desde r4 a r7 l
+                                                            os valores de los r
+                                                            egistros parámetro
+                                                             (r0-r3), el resto 
+                                                            de parámetros que 
+                                                            no caben entre r0 y
+                                                             r3 y las variables
+                                                             checksum y o 
+   14 00000004 E24DD004        sub              sp, sp, #4  ; Añadir a memoria
+                                                            , esto se hace para
+                                                             alinear el sp a 8 
+                                                            bytes porque la fun
+                                                            ción en c lo exige
+                                                            
+   15 00000008 E1A04000        mov              r4, r0      ; input
+   16 0000000C E1A05001        mov              r5, r1      ; weights
+   17 00000010 E1A06002        mov              r6, r2      ; bias
+   18 00000014 E1A07003        mov              r7, r3      ; output
+   19 00000018 E59D8028        ldr              r8, [sp, #40] ; input_size
+   20 0000001C E59D902C        ldr              r9, [sp, #44] ; output_size
+   21 00000020 E3A0A000        mov              r10, #0     ; o = 0
+   22 00000024 E3A0B000        mov              r11, #0     ; checksum = 0
+   23 00000028 E59D0034        ldr              r0, [sp, #52] ; r0=clamp_max
+   24 0000002C E52D0004        str              r0, [sp, #-4]! ; clamp_max se a
+                                                            lmacena en sp, sp e
+                                                            mpuja a la direccio
+                                                            n original de sp
+   25 00000030 E59D0034        ldr              r0, [sp, #52] ; r0=clamp_min
+   26 00000034 E52D0004        str              r0, [sp, #-4]! ; clamp_min se a
+                                                            lmacena en sp, sp e
+                                                            mpuja a la direccio
+                                                            n original de sp
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   27 00000038         buc
+   28 00000038 E159000A        cmp              r9, r10
+   29 0000003C 0A00000F        beq              finbuc
+   30 00000040 E00C089A        mul              r12, r10, r8 ; r12 = o * input_
+                                                            size   (elementos)
+   31 00000044 E1A0C08C        mov              r12, r12, LSL #1 ; r12 = o * in
+                                                            put_size * 2  (byte
+                                                            s, los datos son de
+                                                             "half word")
+   32 00000048 E085100C        add              r1,  r5, r12 ; r1 = weights_o  
+                                                            preparamos el peso 
+                                                            para neuron
+   33 0000004C E1A0C08A        mov              r12, r10, LSL #1 ; r12 = o*2 (b
+                                                            ytes) — reutiliza
+                                                            mos r12
+   34 00000050 E19630FC        ldrsh            r3, [r6, r12] ; r3 = bias[o], p
+                                                            ara neuron
+   35 00000054 E1A00004        mov              r0, r4      ; r0=input (primer 
+                                                            argumento de neuron
+                                                            )
+   36 00000058 E1A02008        mov              r2, r8      ; r2=input_size (te
+                                                            rcer argumento de n
+                                                            euron)
+   37 0000005C EBFFFFFE        bl               neuron_q12_ARM
+   38 00000060 E1A0C08A        mov              r12, r10, LSL #1
+   39 00000064 E18700BC        strh             r0, [r7, r12] ; output[o] = y
+   40 00000068 E08BB28B        add              r11, r11, r11, LSL #5 ; checksu
+                                                            m=checksum*33u (añ
+                                                            adir a memoria que 
+                                                            hay otra solucion (
+                                                            mul r11, #33, r11)
+   41 0000006C E1A00800        mov              r0, r0, LSL #16
+   42 00000070 E1A00820        mov              r0, r0, LSR #16 ; (uint16_t)y, 
+                                                            añadir a memoria, 
+                                                            se "empujan" los pr
+                                                            imeros 16 bits y lu
+                                                            ego se añaden 0s c
+                                                            on LSR, para evitar
+                                                             tener datos con "b
+                                                            asura"
+   43 00000074 E08BB000        add              r11, r11, r0
+   44 00000078 E28AA001        add              r10, r10, #1
+   45 0000007C EAFFFFED        b                buc
+   46 00000080         finbuc
+   47 00000080 E28DD008        add              sp, sp, #8  ;"Desapilamos" los 
+                                                            clamps de neuron
+   48 00000084 E1A0000B        mov              r0, r11     ; Devuelve el resul
+                                                            tado de checksum en
+                                                             r0, como es un arg
+                                                            umento a punto de s
+                                                            alir se puede macha
+                                                            car el resultado de
+                                                             r0
+   49 00000088 E28DD004        add              sp, sp, #4
+   50 0000008C E8BD8FF0        POP              {r4-r11, pc}
+   51 00000090         
+   52 00000090                 END
+Command Line: --debug --xref --diag_suppress=9931 --apcs=interwork --depend=.\o
+bjects\dense_layer_q12_arm.d -o.\objects\dense_layer_q12_arm.o -IC:\Keil_v5\ARM
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\INC\Philips --predefi
+ne="__EVAL SETA 1" --predefine="__UVISION_VERSION SETA 526" --list=.\listings\d
+ense_layer_q12_arm.lst dense_layer_q12_ARM.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+buc 00000038
+
+Symbol: buc
+   Definitions
+      At line 27 in file dense_layer_q12_ARM.s
+   Uses
+      At line 45 in file dense_layer_q12_ARM.s
+Comment: buc used once
+codigo 00000000
+
+Symbol: codigo
+   Definitions
+      At line 8 in file dense_layer_q12_ARM.s
+   Uses
+      None
+Comment: codigo unused
+dense_layer_q12_ARM 00000000
+
+Symbol: dense_layer_q12_ARM
+   Definitions
+      At line 12 in file dense_layer_q12_ARM.s
+   Uses
+      At line 9 in file dense_layer_q12_ARM.s
+Comment: dense_layer_q12_ARM used once
+finbuc 00000080
+
+Symbol: finbuc
+   Definitions
+      At line 46 in file dense_layer_q12_ARM.s
+   Uses
+      At line 29 in file dense_layer_q12_ARM.s
+Comment: finbuc used once
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+neuron_q12_ARM 00000000
+
+Symbol: neuron_q12_ARM
+   Definitions
+      At line 10 in file dense_layer_q12_ARM.s
+   Uses
+      At line 37 in file dense_layer_q12_ARM.s
+Comment: neuron_q12_ARM used once
+1 symbol
+337 symbols in table

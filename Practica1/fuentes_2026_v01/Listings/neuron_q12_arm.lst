@@ -1,0 +1,136 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ; Traducción de neuron_q12_C, recibe como parámetros c
+                       onst int16_t *input, const int16_t *weights, const int16
+                       _t *bias, int16_t *output, uint16_t input_size, uint16_t
+                        output_size, int16_t clamp_min, int16_t clamp_max
+    2 00000000         ; al igual que la función original en C, solo que en fo
+                       rmato "half word" para datos de 16 bits (2 bytes).
+    3 00000000         ; Los primeros 4 argumentos se guardan en los registros 
+                       r0-r3, el resto de parámetros se guardan en pila.
+    4 00000000         ; Registros utilizados: r0-r3, registros de tipo "argume
+                       nto" los cuales pueden ser tanto los argumentos const in
+                       t16_t *input, const int16_t *weights, const int16_t *bia
+                       s, int16_t *output
+    5 00000000         ; como result en el caso de r0 o los clamps en los casos
+                        de r1 y r2, r4 es una copia de input, r5 es una copia d
+                       e weights, r6 de n y r7 de bias, r8 es la variable acc,
+    6 00000000         ; r9 es la variable i del bucle, r10 es una variable par
+                       a alinear las direcciones de input a 2 bytes (halfword),
+                        r13 (sp) es el puntero a la cima de la pila, r14 (lr) g
+                       uarda la dirección de retorno de la subrutina.
+    7 00000000         
+    8 00000000                 AREA             codigo, CODE, READONLY
+    9 00000000                 EXPORT           neuron_q12_ARM
+   10 00000000         
+   11 00000000         neuron_q12_ARM
+   12 00000000 E92D47F0        PUSH             {r4-r10, lr}
+   13 00000004 E1A04000        mov              r4, r0      ; input
+   14 00000008 E1A05001        mov              r5, r1      ; weights
+   15 0000000C E1A06002        mov              r6, r2      ; n
+   16 00000010 E1A07003        mov              r7, r3      ; bias
+   17 00000014 E1A08607        mov              r8, r7, LSL #12 ; int32_t acc =
+                                                             ((int32_t)bias_q12
+                                                            ) << Q_SHIFT, donde
+                                                             Q_SHIFT tiene un v
+                                                            alor de 12, es deci
+                                                            r, lo convertimos e
+                                                            n un numero Q24
+   18 00000018 E3A09000        mov              r9, #0      ; i=0 del bucle
+   19 0000001C         buc
+   20 0000001C E1590006        cmp              r9, r6
+   21 00000020 0A000005        beq              finbuc
+   22 00000024 E1A0A089        mov              r10, r9, LSL #1 ; Alineamos a p
+                                                            alabras de 2 bytes 
+                                                            (ya que input y wei
+                                                            tghts son uint16_t)
+                                                            
+   23 00000028 E19400FA        ldrsh            r0, [r4, r10] ; input[i]
+   24 0000002C E19510FA        ldrsh            r1, [r5, r10] ; weights[i]
+   25 00000030 E0288190        mla              r8, r0, r1, r8 ; acc += (int32_
+                                                            t)input[i] * (int32
+                                                            _t)weights[i], aña
+                                                            dir en memoria, por
+                                                            que se puede disgre
+                                                            gar en un mul y un 
+                                                            add
+   26 00000034 E2899001        add              r9, r9, #1  ; i++
+   27 00000038 EAFFFFF7        b                buc
+   28 0000003C         finbuc
+   29 0000003C E1A00648        mov              r0, r8, ASR #12 ; int32_t resul
+                                                            t_q12 = acc >> Q_SH
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            IFT, guardamos el r
+                                                            esultado de la acum
+                                                            ulación y lo volve
+                                                            mos a convertir en 
+                                                            un Q12
+   30 00000040 E59D1020        ldr              r1, [sp, #32] ; r1 recibe el pa
+                                                            rametro clamp_min
+   31 00000044 E59D2024        ldr              r2, [sp, #36] ; r2 recibe el pa
+                                                            rametro clamp_max
+   32 00000048         ; No se llama a la función de saturación ya que la fun
+                       ción de saturación es un static y no se pueden llamar 
+                       desde otro fichero (static otorga encapsulamiento)
+   33 00000048 E1500001        cmp              r0, r1
+   34 0000004C B1A00001        movlt            r0, r1      ; if (x < clamp_min
+                                                            ) x = clamp_min
+   35 00000050 E1500002        cmp              r0, r2
+   36 00000054 C1A00002        movgt            r0, r2      ; if (x > clamp_max
+                                                            ) x = clamp_max
+   37 00000058 E8BD87F0        POP              {r4-r10, pc}
+   38 0000005C                 END
+Command Line: --debug --xref --diag_suppress=9931 --apcs=interwork --depend=.\o
+bjects\neuron_q12_arm.d -o.\objects\neuron_q12_arm.o -IC:\Keil_v5\ARM\RV31\INC 
+-IC:\Keil_v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\INC\Philips --predefine="__EVAL
+ SETA 1" --predefine="__UVISION_VERSION SETA 526" --list=.\listings\neuron_q12_
+arm.lst neuron_q12_ARM.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+buc 0000001C
+
+Symbol: buc
+   Definitions
+      At line 19 in file neuron_q12_ARM.s
+   Uses
+      At line 27 in file neuron_q12_ARM.s
+Comment: buc used once
+codigo 00000000
+
+Symbol: codigo
+   Definitions
+      At line 8 in file neuron_q12_ARM.s
+   Uses
+      None
+Comment: codigo unused
+finbuc 0000003C
+
+Symbol: finbuc
+   Definitions
+      At line 28 in file neuron_q12_ARM.s
+   Uses
+      At line 21 in file neuron_q12_ARM.s
+Comment: finbuc used once
+neuron_q12_ARM 00000000
+
+Symbol: neuron_q12_ARM
+   Definitions
+      At line 11 in file neuron_q12_ARM.s
+   Uses
+      At line 9 in file neuron_q12_ARM.s
+Comment: neuron_q12_ARM used once
+4 symbols
+336 symbols in table

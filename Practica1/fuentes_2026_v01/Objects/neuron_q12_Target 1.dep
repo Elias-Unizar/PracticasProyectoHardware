@@ -1,0 +1,14 @@
+Dependencies for Project 'neuron_q12', Target 'Target 1': (DO NOT MODIFY !)
+F (.\Startup.s)(0x6AB550E4)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\startup.lst --xref -o .\objects\startup.o --depend .\objects\startup.d)
+F (.\main.c)(0x6AB550E4)(--c99 --gnu -c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork --split_sections-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips-D__UVISION_VERSION="526"-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+I (dense_q12.h)(0x6AB550E4)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599F2F9E)
+F (.\dense_q12.h)(0x6AB550E4)()
+F (.\dense_q12_stubs.c)(0x6AB550E4)(--c99 --gnu -c --cpu ARM7TDMI -D__EVAL -g -O0 --apcs=interwork --split_sections-IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips-D__UVISION_VERSION="526"-o .\objects\dense_q12_stubs.o --omf_browse .\objects\dense_q12_stubs.crf --depend .\objects\dense_q12_stubs.d)
+I (dense_q12.h)(0x6AB550E4)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599F2F9E)
+F (.\dense_layer_q12_ARM.s)(0x6AB550E4)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\dense_layer_q12_arm.lst --xref -o .\objects\dense_layer_q12_arm.o --depend .\objects\dense_layer_q12_arm.d)
+F (.\dense_layer_q12_ARM_C.s)(0x6AB5565F)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\dense_layer_q12_arm_c.lst --xref -o .\objects\dense_layer_q12_arm_c.o --depend .\objects\dense_layer_q12_arm_c.d)
+F (.\dense_layer_q12_THB.s)(0x6AB550E4)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\dense_layer_q12_thb.lst --xref -o .\objects\dense_layer_q12_thb.o --depend .\objects\dense_layer_q12_thb.d)
+F (.\neuron_q12_ARM.s)(0x6AB5526A)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\neuron_q12_arm.lst --xref -o .\objects\neuron_q12_arm.o --depend .\objects\neuron_q12_arm.d)
+F (.\neuron_q12_THB.s)(0x6AB550E4)(--cpu ARM7TDMI --pd "__EVAL SETA 1" -g --apcs=interwork -IC:\Keil_v5\ARM\RV31\INC-IC:\Keil_v5\ARM\CMSIS\Include-IC:\Keil_v5\ARM\INC\Philips--pd "__UVISION_VERSION SETA 526"--list .\listings\neuron_q12_thb.lst --xref -o .\objects\neuron_q12_thb.o --depend .\objects\neuron_q12_thb.d)

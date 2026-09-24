@@ -446,6 +446,31 @@
               <FileType>1</FileType>
               <FilePath>.\dense_q12_stubs.c</FilePath>
             </File>
+            <File>
+              <FileName>dense_layer_q12_ARM.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\dense_layer_q12_ARM.s</FilePath>
+            </File>
+            <File>
+              <FileName>dense_layer_q12_ARM_C.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\dense_layer_q12_ARM_C.s</FilePath>
+            </File>
+            <File>
+              <FileName>dense_layer_q12_THB.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\dense_layer_q12_THB.s</FilePath>
+            </File>
+            <File>
+              <FileName>neuron_q12_ARM.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\neuron_q12_ARM.s</FilePath>
+            </File>
+            <File>
+              <FileName>neuron_q12_THB.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\neuron_q12_THB.s</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

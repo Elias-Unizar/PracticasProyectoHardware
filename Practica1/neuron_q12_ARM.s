@@ -21,7 +21,7 @@ buc
 	beq finbuc
 	mov r10, r9, LSL #1 	; Alineamos a palabras de 2 bytes (ya que input y weitghts son uint16_t)
 	ldrsh r0, [r4, r10]		; input[i]
-	ldrsh r1, [r5, r12]		; weights[i]
+	ldrsh r1, [r5, r10]		; weights[i]
 	mla r8, r0, r1, r8		; acc += (int32_t)input[i] * (int32_t)weights[i], añadir en memoria, porque se puede disgregar en un mul y un add
 	add r9, r9, #1			; i++
 	b buc

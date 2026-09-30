@@ -1,0 +1,142 @@
+T6A8C 038:310.824   SEGGER J-Link V7.94e Log File
+T6A8C 038:311.218   DLL Compiled: Jan 15 2024 15:13:38
+T6A8C 038:311.224   Logging started @ 2024-09-27 15:43
+T6A8C 038:311.230   Process: C:\Keil_v5\UV4\UV4.EXE
+T6A8C 038:311.408 - 38311.236ms
+T6A8C 038:311.560 JLINK_SetWarnOutHandler(...)
+T6A8C 038:311.573 - 0.143ms
+T6A8C 038:311.586 JLINK_OpenEx(...)
+T6A8C 038:317.069   Firmware: J-Link OB-nRF5340-NordicSemi compiled Oct 30 2023 12:13:06
+T6A8C 038:317.907   Firmware: J-Link OB-nRF5340-NordicSemi compiled Oct 30 2023 12:13:06
+T6A8C 038:350.186   Hardware: V1.00
+T6A8C 038:350.203   S/N: 1050239698
+T6A8C 038:350.212   OEM: SEGGER
+T6A8C 038:350.221   Feature(s): RDI, FlashBP, FlashDL, JFlash, GDB
+T6A8C 038:350.989   Bootloader: 2021 May 18
+T6A8C 038:351.363   USB speed mode: Full speed (12 MBit/s)
+T6A8C 038:351.742   TELNET listener socket opened on port 19021
+T6A8C 038:352.063   WEBSRV WEBSRV_Init(): Starting webserver thread(s)
+T6A8C 038:352.188   WEBSRV Webserver running on local port 19080
+T6A8C 038:352.317   Looking for J-Link GUI Server exe at: C:\Keil_v5\ARM\Segger\JLinkGUIServer.exe
+T6A8C 038:352.436   Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink_V794e\JLinkGUIServer.exe
+T6A8C 038:352.513   Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink_V794e\JLinkGUIServer.exe
+T6A8C 038:417.029   J-Link GUI Server info: "J-Link GUI server V7.94e "
+T6A8C 038:433.120 - 121.387ms returns "O.K."
+T6A8C 038:433.150 JLINK_GetEmuCaps()
+T6A8C 038:433.159 - 0.007ms returns 0xB8EA5A33
+T6A8C 038:433.168 JLINK_TIF_GetAvailable(...)
+T6A8C 038:433.286 - 0.117ms
+T6A8C 038:433.299 JLINK_SetErrorOutHandler(...)
+T6A8C 038:433.305 - 0.006ms
+T6A8C 038:433.449 JLINK_ExecCommand("ProjectFile = "C:\Users\enrique\Dropbox\Docencia\ProyHardware2012\PH_24_25\Materiales\Fuentes_Guion2\blink_v2_lpc_resuelto\nrf\keil\JLinkSettings.ini"", ...). 
+T6A8C 038:474.580   Ref file found at: C:\Keil_v5\ARM\Segger\JLinkDevices.ref
+T6A8C 038:474.766   REF file references invalid XML file: C:\Program Files\SEGGER\JLink_V794e\JLinkDevices.xml
+T6A8C 038:476.424 - 42.975ms returns 0x00
+T6A8C 038:476.483 JLINK_ExecCommand("Device = nRF52840_xxAA", ...). 
+T6A8C 038:477.951   Device "NRF52840_XXAA" selected.
+T6A8C 038:478.278 - 1.775ms returns 0x00
+T6A8C 038:478.297 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T6A8C 038:478.307 - 0.001ms returns 0x01
+T6A8C 038:478.319 JLINK_GetHardwareVersion()
+T6A8C 038:478.328 - 0.006ms returns 10000
+T6A8C 038:478.337 JLINK_GetDLLVersion()
+T6A8C 038:478.348 - 0.011ms returns 79405
+T6A8C 038:478.361 JLINK_GetOEMString(...)
+T6A8C 038:478.378 JLINK_GetFirmwareString(...)
+T6A8C 038:478.387 - 0.008ms
+T6A8C 038:478.402 JLINK_GetDLLVersion()
+T6A8C 038:478.411 - 0.008ms returns 79405
+T6A8C 038:478.422 JLINK_GetCompileDateTime()
+T6A8C 038:478.430 - 0.008ms
+T6A8C 038:478.441 JLINK_GetFirmwareString(...)
+T6A8C 038:478.450 - 0.008ms
+T6A8C 038:478.460 JLINK_GetHardwareVersion()
+T6A8C 038:478.469 - 0.008ms returns 10000
+T6A8C 038:478.480 JLINK_GetSN()
+T6A8C 038:478.489 - 0.008ms returns 1050239698
+T6A8C 038:478.499 JLINK_GetOEMString(...)
+T6A8C 038:478.516 JLINK_TIF_Select(JLINKARM_TIF_SWD)
+T6A8C 038:479.203 - 0.686ms returns 0x00
+T6A8C 038:479.232 JLINK_HasError()
+T6A8C 038:479.443 JLINK_SetSpeed(5000)
+T6A8C 038:479.528 - 0.087ms
+T6A8C 038:479.892 JLINK_HasError()
+T6A8C 038:479.909 JLINK_SetResetType(JLINKARM_RESET_TYPE_NORMAL)
+T6A8C 038:479.916 - 0.006ms returns JLINKARM_RESET_TYPE_NORMAL
+T6A8C 038:479.924 JLINK_Reset()
+T6A8C 038:480.080   InitTarget() start
+T6A8C 038:480.104    J-Link Script File: Executing InitTarget()
+T6A8C 038:482.197   CTRL-AP indicates that the device is secured.
+For debugger connection the device needs to be unsecured.
+Note: Unsecuring will trigger a mass erase of the internal flash.
+
+T6A8C 038:482.211   Executing default behavior previously saved in the registry.
+T6A8C 038:482.220   Device will be unsecured now.
+T6A8C 038:703.079   InitTarget() end - Took 222ms
+T6A8C 038:703.595   Found SW-DP with ID 0x2BA01477
+T6A8C 038:706.558   DPIDR: 0x2BA01477
+T6A8C 038:706.612   CoreSight SoC-400 or earlier
+T6A8C 038:706.625   Scanning AP map to find all available APs
+T6A8C 038:707.489   AP[2]: Stopped AP scan as end of AP map has been reached
+T6A8C 038:707.614   AP[0]: AHB-AP (IDR: 0x24770011)
+T6A8C 038:707.627   AP[1]: JTAG-AP (IDR: 0x02880000)
+T6A8C 038:707.636   Iterating through AP map to find AHB-AP to use
+T6A8C 038:708.494   AP[0]: Core found
+T6A8C 038:708.507   AP[0]: AHB-AP ROM base: 0xE00FF000
+T6A8C 038:708.916   CPUID register: 0x410FC241. Implementer code: 0x41 (ARM)
+T6A8C 038:708.933   Found Cortex-M4 r0p1, Little endian.
+T6A8C 038:709.178   -- Max. mem block: 0x0003C600
+T6A8C 038:709.478   Cortex-M: The connected J-Link (S/N 1050239698) uses an old firmware module: V1 (current is 2)
+T6A8C 038:709.516   CPU_ReadMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:710.042   CPU_WriteMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:710.365   CPU_ReadMem(4 bytes @ 0xE0002000)
+T6A8C 038:710.670   FPUnit: 6 code (BP) slots and 2 literal slots
+T6A8C 038:710.683   CPU_ReadMem(4 bytes @ 0xE000EDFC)
+T6A8C 038:710.995   CPU_WriteMem(4 bytes @ 0xE000EDFC)
+T6A8C 038:711.297   CPU_ReadMem(4 bytes @ 0xE0001000)
+T6A8C 038:711.666   CPU_WriteMem(4 bytes @ 0xE0001000)
+T6A8C 038:711.965   CPU_ReadMem(4 bytes @ 0xE000ED88)
+T6A8C 038:712.269   CPU_WriteMem(4 bytes @ 0xE000ED88)
+T6A8C 038:712.567   CPU_ReadMem(4 bytes @ 0xE000ED88)
+T6A8C 038:712.909   CPU_WriteMem(4 bytes @ 0xE000ED88)
+T6A8C 038:713.215   CoreSight components:
+T6A8C 038:713.237   ROMTbl[0] @ E00FF000
+T6A8C 038:713.247   CPU_ReadMem(64 bytes @ 0xE00FF000)
+T6A8C 038:713.977   CPU_ReadMem(32 bytes @ 0xE000EFE0)
+T6A8C 038:714.481   [0][0]: E000E000 CID B105E00D PID 000BB00C SCS-M7
+T6A8C 038:714.493   CPU_ReadMem(32 bytes @ 0xE0001FE0)
+T6A8C 038:714.989   [0][1]: E0001000 CID B105E00D PID 003BB002 DWT
+T6A8C 038:715.001   CPU_ReadMem(32 bytes @ 0xE0002FE0)
+T6A8C 038:715.505   [0][2]: E0002000 CID B105E00D PID 002BB003 FPB
+T6A8C 038:715.517   CPU_ReadMem(32 bytes @ 0xE0000FE0)
+T6A8C 038:716.016   [0][3]: E0000000 CID B105E00D PID 003BB001 ITM
+T6A8C 038:716.028   CPU_ReadMem(32 bytes @ 0xE0040FE0)
+T6A8C 038:716.563   [0][4]: E0040000 CID B105900D PID 000BB9A1 TPIU
+T6A8C 038:716.576   CPU_ReadMem(32 bytes @ 0xE0041FE0)
+T6A8C 038:717.125   [0][5]: E0041000 CID B105900D PID 000BB925 ETM
+T6A8C 038:717.334   CPU is running
+T6A8C 038:717.356   CPU_WriteMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:717.674   CPU is running
+T6A8C 038:717.686   CPU_WriteMem(4 bytes @ 0xE000EDFC)
+T6A8C 038:717.995   Reset: Halt core after reset via DEMCR.VC_CORERESET.
+T6A8C 038:718.293   Reset: Reset device via AIRCR.SYSRESETREQ.
+T6A8C 038:718.307   CPU is running
+T6A8C 038:718.318   CPU_WriteMem(4 bytes @ 0xE000ED0C)
+T6A8C 038:771.374   CPU_ReadMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:771.889   CPU_ReadMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:775.986   CPU_WriteMem(4 bytes @ 0xE000EDFC)
+T6A8C 038:781.510   CPU_ReadMem(4 bytes @ 0xE000EDF0)
+T6A8C 038:785.150   CPU_WriteMem(4 bytes @ 0xE0002000)
+T6A8C 038:785.452   CPU_ReadMem(4 bytes @ 0xE000EDFC)
+T6A8C 038:785.885   CPU_ReadMem(4 bytes @ 0xE0001000)
+T6A8C 038:786.213 - 306.288ms
+T6A8C 038:786.283 JLINK_GetId()
+T6A8C 038:786.480 - 0.196ms returns 0x2BA01477
+T6A8C 038:790.736 JLINK_GetFirmwareString(...)
+T6A8C 038:790.751 - 0.014ms
+T6A8C 045:502.204 JLINK_Close()
+T6A8C 045:502.478   CPU_ReadMem(4 bytes @ 0xE0001000)
+T6A8C 045:502.902   CPU_WriteMem(4 bytes @ 0xE0001004)
+T6A8C 045:512.041 - 9.836ms
+T6A8C 045:512.059   
+T6A8C 045:512.065   Closed

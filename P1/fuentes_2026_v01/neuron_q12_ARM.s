@@ -6,9 +6,9 @@
 ; r9 es la variable i del bucle, r10 es una variable para alinear las direcciones de input a 2 bytes (halfword), r13 (sp) es el puntero a la cima de la pila, r14 (lr) guarda la dirección de retorno de la subrutina.
 
 	AREA codigo, CODE, READONLY
-	EXPORT neuron_q12_ARM
+	EXPORT neuron_q12_Deprecated
 	
-neuron_q12_ARM
+neuron_q12_Deprecated
 	PUSH {r4-r10, lr}
 	mov r4, r0 				; input
 	mov r5, r1 				; weights

@@ -6,10 +6,10 @@
 ; r10 es la variable del bucle "o", r11 es la variable checksum y r12 es una variable temporal, que sirve tanto para calcular o * input_size * 2 como para o * 2.
 ; r13 (sp) es el puntero a pila, r14 (lr) es el link register, esencial para tener la dirección de retorno en suburtinas
 	AREA codigo, CODE, READONLY
-	EXPORT  dense_layer_q12_ARM
-	IMPORT  neuron_q12_ARM
+	EXPORT  dense_layer_q12_ARM_Deprecated
+	IMPORT  neuron_q12_Deprecated
 	
-dense_layer_q12_ARM							
+dense_layer_q12_ARM_Deprecated							
 	PUSH {r4-r11, lr}		; Añadiremos en pila desde r4 a r7 los valores de los registros parámetro (r0-r3), el resto de parámetros que no caben entre r0 y r3 y las variables checksum y o 
 	sub sp, sp, #4			; Añadir a memoria, esto se hace para alinear el sp a 8 bytes porque la función en c lo exige
 	mov r4, r0              ; input
@@ -34,7 +34,7 @@ buc
     ldrsh r3, [r6, r12]     ; r3 = bias[o], para neuron
 	mov r0, r4				; r0=input (primer argumento de neuron)
 	mov r2, r8				; r2=input_size (tercer argumento de neuron)
-	bl neuron_q12_ARM
+	bl neuron_q12_Deprecated
 	mov r12, r10, LSL #1
 	strh r0, [r7, r12]		; output[o] = y
 	add r11, r11, r11, LSL #5	; checksum=checksum*33u (añadir a memoria que hay otra solucion (mul r11, #33, r11)

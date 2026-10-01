@@ -268,5 +268,5 @@ uint8_t dense_q12_verificar(
     uint16_t output_size,
     int16_t clamp_min,
     int16_t clamp_max);
-
+		
 #endif /* DENSE_Q12_H */

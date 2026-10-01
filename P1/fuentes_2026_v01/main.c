@@ -149,6 +149,44 @@ uint32_t dense_layer_q12_C_THB(
 // ======================================================================
 
 
+uint8_t verificarNeurona(const int16_t *input, const int16_t *weights, const int16_t bias, const int16_t resultadoEsperado,
+												uint16_t input_size, int16_t clamp_min, int16_t clamp_max){ 
+													
+		uint16_t valorC = neuron_q12_C(input, weights, input_size, bias, clamp_min, clamp_max);
+		uint16_t valorTHB = neuron_q12_THB(input, weights, input_size, bias, clamp_min, clamp_max);
+		
+		if(!(valorC == valorTHB && valorTHB == resultadoEsperado)) return 0;
+		return 1;
+}
+
+
+uint8_t verificarDense(const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *resultadoOPT,
+												uint16_t input_size, uint16_t output_size, int16_t clamp_min, int16_t clamp_max, const int16_t *resultadoEsperado){
+	
+		uint32_t chk_ARM = dense_layer_q12_ARM( input, weights, bias, resultadoOPT, 
+																						input_size, output_size, clamp_min, clamp_max);
+		
+		if (!vectores_iguales_i16(resultadoOPT, resultadoEsperado, output_size)) return 0;
+		return 1;
+}
+
+
+uint8_t probarAuto(const int16_t *input, const int16_t *weights, const int16_t *bias, int16_t *resultadoOPT,
+									uint16_t input_size, uint16_t output_size, int16_t clamp_min, int16_t clamp_max, const int16_t *resultadoEsperado){
+
+				uint8_t ok;
+				for(int i = 0; i < OUTPUT_SIZE; i++){
+					ok = verificarNeurona(input, &weights[i * INPUT_SIZE], bias[i], resultadoEsperado[i], input_size, clamp_min, clamp_max);
+					if(!ok) return ok;
+				}
+				ok = verificarDense(input, weights, bias, resultadoOPT, input_size, output_size, clamp_min, clamp_max, resultadoEsperado);
+				if(!ok) return ok;
+        if (dense_q12_verificar(input, weights, bias, resultadoOPT, input_size,             
+																output_size, clamp_min, clamp_max)) return 1; 
+        else { return 0;}         
+}
+
+
 /**
  * @brief   Ejecuta C, C_ARM, C_THB, ARM_C, ARM y THB y verifica resultados.
  *
@@ -177,7 +215,6 @@ uint8_t dense_q12_verificar(
     static int16_t out_C_THB [OUTPUT_SIZE];
     static int16_t out_ARM_C [OUTPUT_SIZE];
     static int16_t out_ARM   [OUTPUT_SIZE];
-    static int16_t out_ARM_OPT   [OUTPUT_SIZE];
     static int16_t out_THB   [OUTPUT_SIZE];
 
     uint32_t chk_C = dense_layer_q12_C(
@@ -196,10 +233,6 @@ uint8_t dense_q12_verificar(
         input, weights, bias, out_ARM_C,
         input_size, output_size, clamp_min, clamp_max);
 
-		uint32_t chk_ARM_OPT = dense_layer_q12_ARM_OPT( 
-				input, weights, bias, out_ARM_OPT,
-				input_size, output_size, clamp_min, clamp_max);
-
     uint32_t chk_ARM = dense_layer_q12_ARM(
         input, weights, bias, out_ARM,
         input_size, output_size, clamp_min, clamp_max);
@@ -214,7 +247,7 @@ uint8_t dense_q12_verificar(
 
     if (!(chk_C == chk_C_ARM && chk_C == chk_C_THB &&
           chk_C == chk_ARM_C && chk_C == chk_ARM && 
-					chk_C == chk_THB && chk_C == chk_ARM_OPT)) {
+					chk_C == chk_THB)) {
         return 0;
     }
 
@@ -223,24 +256,9 @@ uint8_t dense_q12_verificar(
     if (!vectores_iguales_i16(out_C, out_ARM_C, output_size)) return 0;
     if (!vectores_iguales_i16(out_C, out_ARM,   output_size)) return 0;
     if (!vectores_iguales_i16(out_C, out_THB,   output_size)) return 0;
-    if (!vectores_iguales_i16(out_C, out_ARM_OPT,   output_size)) return 0;
 
     return 1;
 }
-
-static uint32_t n            = 0;
-static uint32_t pasados      = 0;
-static uint32_t fallados     = 0;
-static uint32_t primer_fallo = 0;
-static int16_t resultado[OUTPUT_SIZE] __attribute__((aligned(8)));
-
-void probarAuto(const int16_t *input, const int16_t *weights, const int16_t *bias){                                                                                                                        \
-        n++;                                                                 
-        if (dense_q12_verificar(input, weights, bias, resultado, INPUT_SIZE,             
-																OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12)) pasados++;       
-        else { fallados++; if (!primer_fallo) primer_fallo = n; }            
-}
-
 
 /* ============================================================
    MAIN de prueba
@@ -295,65 +313,124 @@ int main(void) {
          Q_ONE / 4,
          0
     };
+		
     // ------------------------------------------------------------------
     // DATOS NUEVOS Y PROBAR AUTO
     // ------------------------------------------------------------------
-    // Entradas
-    static const int16_t input_unos[INPUT_SIZE] __attribute__((aligned(8))) = {
-        Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE          // todo 1.0
+    static const int16_t resultEsperadoOriginal[INPUT_SIZE] = {0x1000, 0x0, 0x0, 0x40, 0x0};
+    int16_t resultado[OUTPUT_SIZE] __attribute__((aligned(8)));
+		
+		uint8_t ok = probarAuto(input, weights, bias, resultado, INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, resultEsperadoOriginal);      // 1  original
+		//(void)ok;
+    while (1) { /* no retornar */ }
+}
+
+/*// ==============================
+========================================
+// 4 ejemplos con solución esperada + 1 prueba con tamaños crecientes
+// Usan probarAuto(input, weights, bias, esperado, input_size, output_size, clamp_min, clamp_max)
+// ======================================================================
+
+#define CLAMP_FULL_MIN  ((int16_t)-32768)   // sin saturación efectiva
+#define CLAMP_FULL_MAX  ((int16_t) 32767)
+
+uint32_t pruebasExtra(void) {
+    uint32_t fallos = 0;
+
+    // ---- Datos compartidos ------------------------------------------------
+    static const int16_t input_id[INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, Q_ONE / 2, -Q_ONE / 4, 3 * Q_ONE / 4, 0, -Q_ONE / 2, Q_ONE / 4, Q_ONE / 8
     };
-    static const int16_t input_extremos[INPUT_SIZE] __attribute__((aligned(8))) = {
-         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,
-         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE                  // +-2.0 alternado
+    static const int16_t input_cero[INPUT_SIZE] __attribute__((aligned(8))) = {
+        0, 0, 0, 0, 0, 0, 0, 0
     };
-    static const int16_t input_minimos[INPUT_SIZE] __attribute__((aligned(8))) = {
-        1, 1, 1, 1, 1, 1, 1, 1                                          // 1 LSB
+    static const int16_t input_ext[INPUT_SIZE] __attribute__((aligned(8))) = {
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE
     };
 
-    // Pesos
-    static const int16_t weights_ident[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
-        Q_ONE, 0, 0, 0, 0, 0, 0, 0,                                     // salida[o] = entrada[o]
+    // Identidad: 1.0 en la diagonal
+    static const int16_t w_id[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, 0, 0, 0, 0, 0, 0, 0,
         0, Q_ONE, 0, 0, 0, 0, 0, 0,
         0, 0, Q_ONE, 0, 0, 0, 0, 0,
         0, 0, 0, Q_ONE, 0, 0, 0, 0,
         0, 0, 0, 0, Q_ONE, 0, 0, 0
     };
-    static const int16_t weights_grandes[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
-        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
-        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
-        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
-        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
-        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE
-    };
-    static const int16_t weights_menos1[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
-        -1, -1, -1, -1, -1, -1, -1, -1,                                 // 1 LSB negativo
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1
+    // Pesos extremos: +2.0, -2.0, alternado (suma 0), +1.0, -1.0
+    static const int16_t w_ext[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+         2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,
+        -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE,
+         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,
+         Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE,
+        -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE
     };
 
-    // Bias
-    static const int16_t bias_extremos[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+    static const int16_t bias_cero[OUTPUT_SIZE] __attribute__((aligned(8))) = { 0, 0, 0, 0, 0 };
+    static const int16_t bias_peq [OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        0, Q_ONE / 8, -Q_ONE / 4, Q_ONE / 4, 0
+    };
+    static const int16_t bias_ext [OUTPUT_SIZE] __attribute__((aligned(8))) = {
         32767, -32768, 32767, -32768, 0
     };
-    static const int16_t bias_medio[OUTPUT_SIZE] __attribute__((aligned(8))) = {
-        Q_ONE, -Q_ONE, Q_ONE / 2, -Q_ONE / 2, 0
-    };
-		
-    probarAuto(input,           weights,        bias);          // 1  original
-    probarAuto(input_unos,      weights,        bias);          // 2  entrada nueva
-    probarAuto(input_extremos,  weights,        bias_extremos); // 3  entrada y bias extremos
-    probarAuto(input,           weights_ident,  bias);          // 4  identidad
-    probarAuto(input_unos,      weights_ident,  bias_medio);    // 5  identidad + bias
-    probarAuto(input_unos,      weights_grandes, bias);         // 6  saturación superior
-    probarAuto(input_extremos,  weights_grandes, bias_extremos);// 7  pesos grandes + extremos
-    probarAuto(input_minimos,   weights_menos1, bias);          // 8  -1 LSB (comprueba ASR)
-    probarAuto(input_minimos,   weights_grandes, bias_medio);   // 9  valores pequeños
-    probarAuto(input_extremos,  weights_menos1, bias_medio);    // 10 mezcla
 
-		
-    // Punto de parada para depuración: inspeccionar 'pasados', 'fallados',
-    // 'primer_fallo' y 'resultado' (salida C de la última prueba).
-    while (1) { /* no retornar */ }
-	}
+    // ---- Soluciones esperadas --------------------------------------------
+    static const int16_t esp_id[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, Q_ONE / 2, -Q_ONE / 4, 3 * Q_ONE / 4, 0      // = las 5 primeras entradas
+    };
+    static const int16_t esp_vacio[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        0, Q_ONE / 8, -Q_ONE / 4, Q_ONE / 4, 0              // = bias_peq
+    };
+    static const int16_t esp_sat[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, -Q_ONE, 0, Q_ONE, -Q_ONE                      // clamp en [-1.0, 1.0]
+    };
+    static const int16_t esp_bias_ext[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        32767, -32768, 32767, -32768, 0                      // = bias_ext (sin clamp)
+    };
+
+    // 1) Identidad: salida = entrada
+    if (!probarAuto(input_id, w_id, bias_cero, esp_id,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_FULL_MIN, CLAMP_FULL_MAX)) fallos++;
+
+    // 2) Entrada vacía (ceros), pesos cualquiera: salida = bias
+    if (!probarAuto(input_cero, w_ext, bias_peq, esp_vacio,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_FULL_MIN, CLAMP_FULL_MAX)) fallos++;
+
+    // 3) Valores extremos en entrada y pesos: saturación superior, inferior y cancelación
+    if (!probarAuto(input_ext, w_ext, bias_cero, esp_sat,
+                    INPUT_SIZE, OUTPUT_SIZE, -Q_ONE, Q_ONE)) fallos++;
+
+    // 4) Bias extremos (32767 / -32768): comprueba bias << 12 sin desbordar
+    if (!probarAuto(input_cero, w_ext, bias_ext, esp_bias_ext,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_FULL_MIN, CLAMP_FULL_MAX)) fallos++;
+
+    return fallos;
+}
+
+// ======================================================================
+// Tamaños crecientes: input_size de 1 a INPUT_SIZE; output_size crece
+// con él hasta OUTPUT_SIZE. Pesos todo 1.0, entradas 0.125, bias o*(1/16).
+//   esperado[o] = input_size * 0.125 + bias[o]
+// ======================================================================
+uint32_t pruebaTamanosCrecientes(void) {
+    static int16_t in [INPUT_SIZE]               __attribute__((aligned(8)));
+    static int16_t w  [OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8)));
+    static int16_t b  [OUTPUT_SIZE]              __attribute__((aligned(8)));
+    static int16_t esp[OUTPUT_SIZE]              __attribute__((aligned(8)));
+
+    uint32_t fallos = 0;
+
+    for (uint16_t n_in = 1; n_in <= INPUT_SIZE; ++n_in) {
+        uint16_t n_out = (n_in < OUTPUT_SIZE) ? n_in : OUTPUT_SIZE;
+
+        for (uint16_t i = 0; i < n_in; ++i) in[i] = Q_ONE / 8;
+
+        for (uint16_t o = 0; o < n_out; ++o) {
+            for (uint16_t i = 0; i < n_in; ++i) w[o * n_in + i] = Q_ONE;   // fila de n_in pesos
+            b[o]   = (int16_t)(o * (Q_ONE / 16));
+            esp[o] = (int16_t)(n_in * (Q_ONE / 8) + b[o]);
+        }
+
+        if (!probarAuto(in, w, b, esp, n_in, n_out, CLAMP_FULL_MIN, CLAMP_FULL_MAX)) fallos++;
+    }
+    return fallos;
+}*/

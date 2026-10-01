@@ -176,7 +176,7 @@ uint8_t probarAuto(const int16_t *input, const int16_t *weights, const int16_t *
 
 				uint8_t ok;
 				for(int i = 0; i < OUTPUT_SIZE; i++){
-					ok = verificarNeurona(input, &weights[i * INPUT_SIZE], bias[i], resultadoEsperado[i], input_size, clamp_min, clamp_max);
+					ok = verificarNeurona(input, &weights[i * input_size], bias[i], resultadoEsperado[i], input_size, clamp_min, clamp_max);
 					if(!ok) return ok;
 				}
 				ok = verificarDense(input, weights, bias, resultadoOPT, input_size, output_size, clamp_min, clamp_max, resultadoEsperado);

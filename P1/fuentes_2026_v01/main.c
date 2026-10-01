@@ -319,9 +319,72 @@ int main(void) {
     // ------------------------------------------------------------------
     static const int16_t resultEsperadoOriginal[INPUT_SIZE] = {0x1000, 0x0, 0x0, 0x40, 0x0};
     int16_t resultado[OUTPUT_SIZE] __attribute__((aligned(8)));
-		
 		uint8_t ok = probarAuto(input, weights, bias, resultado, INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, resultEsperadoOriginal);      // 1  original
 		//(void)ok;
+		    // ---- Datos compartidos ------------------------------------------------
+    static const int16_t input_id[INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, Q_ONE / 2, -Q_ONE / 4, 3 * Q_ONE / 4, 0, -Q_ONE / 2, Q_ONE / 4, Q_ONE / 8
+    };
+    static const int16_t input_cero[INPUT_SIZE] __attribute__((aligned(8))) = {
+        0, 0, 0, 0, 0, 0, 0, 0
+    };
+    static const int16_t input_ext[INPUT_SIZE] __attribute__((aligned(8))) = {
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE
+    };
+
+		// Identidad: 1.0 en la diagonal
+    static const int16_t w_id[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, 0, 0, 0, 0, 0, 0, 0,
+        0, Q_ONE, 0, 0, 0, 0, 0, 0,
+        0, 0, Q_ONE, 0, 0, 0, 0, 0,
+        0, 0, 0, Q_ONE, 0, 0, 0, 0,
+        0, 0, 0, 0, Q_ONE, 0, 0, 0
+    };
+    // Pesos extremos: +2.0, -2.0, alternado (suma 0), +1.0, -1.0
+    static const int16_t w_ext[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+         2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,  2 * Q_ONE,
+        -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE, -2 * Q_ONE,
+         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,
+         Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE,
+        -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE, -Q_ONE
+    };
+		
+		static const int16_t bias_cero[OUTPUT_SIZE] __attribute__((aligned(8))) = { 0, 0, 0, 0, 0 };
+    static const int16_t bias_peq [OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        0, Q_ONE / 8, -Q_ONE / 4, Q_ONE / 4, 0
+    };
+    static const int16_t bias_ext [OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, -Q_ONE, Q_ONE, -Q_ONE, 0
+    };
+		
+		static const int16_t esp_id[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, Q_ONE / 2, 0, 3 * Q_ONE / 4, 0      // = las 5 primeras entradas
+    };
+    static const int16_t esp_vacio[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        0, Q_ONE / 8, 0, Q_ONE / 4, 0              // = bias_peq
+    };
+    static const int16_t esp_sat[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, 0, 0, Q_ONE, 0                      // clamp en [-1.0, 1.0]
+    };
+    static const int16_t esp_bias_ext[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, 0, Q_ONE, 0, 0                      // = bias_ext (sin clamp)
+    };
+
+		// 1) Identidad: salida = entrada
+    ok = probarAuto(input_id, w_id, bias_cero, resultado,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, esp_id);
+
+    // 2) Entrada vacía (ceros), pesos cualquiera: salida = bias
+    ok = probarAuto(input_cero, w_ext, bias_peq, resultado,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, esp_vacio);
+
+    // 3) Valores extremos en entrada y pesos: saturación superior, inferior y cancelación
+    ok = probarAuto(input_ext, w_ext, bias_cero, resultado,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, esp_sat);
+
+    // 4) Bias extremos (32767 / -32768): comprueba bias << 12 sin desbordar
+   ok = probarAuto(input_cero, w_ext, bias_ext, resultado,
+                    INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12, esp_bias_ext);
     while (1) { /* no retornar */ }
 }
 

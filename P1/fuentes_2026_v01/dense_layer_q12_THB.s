@@ -59,6 +59,7 @@ finBucFor
 				MOVS r0, r6
 				ADR r1, saltoARM
 				BX r1
+				NOP
 				ARM
 saltoARM
 				POP{r4-r11, PC}

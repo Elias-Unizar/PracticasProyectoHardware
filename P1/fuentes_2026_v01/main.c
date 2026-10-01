@@ -228,6 +228,20 @@ uint8_t dense_q12_verificar(
     return 1;
 }
 
+static uint32_t n            = 0;
+static uint32_t pasados      = 0;
+static uint32_t fallados     = 0;
+static uint32_t primer_fallo = 0;
+static int16_t resultado[OUTPUT_SIZE] __attribute__((aligned(8)));
+
+void probarAuto(const int16_t *input, const int16_t *weights, const int16_t *bias){                                                                                                                        \
+        n++;                                                                 
+        if (dense_q12_verificar(input, weights, bias, resultado, INPUT_SIZE,             
+																OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12)) pasados++;       
+        else { fallados++; if (!primer_fallo) primer_fallo = n; }            
+}
+
+
 /* ============================================================
    MAIN de prueba
    ============================================================ */
@@ -281,30 +295,65 @@ int main(void) {
          Q_ONE / 4,
          0
     };
+    // ------------------------------------------------------------------
+    // DATOS NUEVOS Y PROBAR AUTO
+    // ------------------------------------------------------------------
+    // Entradas
+    static const int16_t input_unos[INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE, Q_ONE          // todo 1.0
+    };
+    static const int16_t input_extremos[INPUT_SIZE] __attribute__((aligned(8))) = {
+         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE,
+         2 * Q_ONE, -2 * Q_ONE,  2 * Q_ONE, -2 * Q_ONE                  // +-2.0 alternado
+    };
+    static const int16_t input_minimos[INPUT_SIZE] __attribute__((aligned(8))) = {
+        1, 1, 1, 1, 1, 1, 1, 1                                          // 1 LSB
+    };
 
-    // Búfer para quedarse con la salida de referencia C.
-    static int16_t resultado[OUTPUT_SIZE] __attribute__((aligned(8)));
+    // Pesos
+    static const int16_t weights_ident[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, 0, 0, 0, 0, 0, 0, 0,                                     // salida[o] = entrada[o]
+        0, Q_ONE, 0, 0, 0, 0, 0, 0,
+        0, 0, Q_ONE, 0, 0, 0, 0, 0,
+        0, 0, 0, Q_ONE, 0, 0, 0, 0,
+        0, 0, 0, 0, Q_ONE, 0, 0, 0
+    };
+    static const int16_t weights_grandes[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE,
+        2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE, 2 * Q_ONE
+    };
+    static const int16_t weights_menos1[OUTPUT_SIZE * INPUT_SIZE] __attribute__((aligned(8))) = {
+        -1, -1, -1, -1, -1, -1, -1, -1,                                 // 1 LSB negativo
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1
+    };
 
-    // Verificación.
-    uint8_t ok = dense_q12_verificar(
-        input,
-        weights,
-        bias,
-        resultado,
-        INPUT_SIZE,
-        OUTPUT_SIZE,
-        CLAMP_MIN_Q12,
-        CLAMP_MAX_Q12
-    );
+    // Bias
+    static const int16_t bias_extremos[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        32767, -32768, 32767, -32768, 0
+    };
+    static const int16_t bias_medio[OUTPUT_SIZE] __attribute__((aligned(8))) = {
+        Q_ONE, -Q_ONE, Q_ONE / 2, -Q_ONE / 2, 0
+    };
+		
+    probarAuto(input,           weights,        bias);          // 1  original
+    probarAuto(input_unos,      weights,        bias);          // 2  entrada nueva
+    probarAuto(input_extremos,  weights,        bias_extremos); // 3  entrada y bias extremos
+    probarAuto(input,           weights_ident,  bias);          // 4  identidad
+    probarAuto(input_unos,      weights_ident,  bias_medio);    // 5  identidad + bias
+    probarAuto(input_unos,      weights_grandes, bias);         // 6  saturación superior
+    probarAuto(input_extremos,  weights_grandes, bias_extremos);// 7  pesos grandes + extremos
+    probarAuto(input_minimos,   weights_menos1, bias);          // 8  -1 LSB (comprueba ASR)
+    probarAuto(input_minimos,   weights_grandes, bias_medio);   // 9  valores pequeños
+    probarAuto(input_extremos,  weights_menos1, bias_medio);    // 10 mezcla
 
 		
-    // Punto de parada para depuración: inspeccionar 'ok' y 'resultado'.
-    // En este entorno no hay SO; nos quedamos en bucle.
-    //(void)ok;
-
-	
-//		uint32_t chk_ARM = dense_layer_q12_ARM_OPT( input, weights, bias, resultado,
-//																			INPUT_SIZE, OUTPUT_SIZE, CLAMP_MIN_Q12, CLAMP_MAX_Q12);
-		
+    // Punto de parada para depuración: inspeccionar 'pasados', 'fallados',
+    // 'primer_fallo' y 'resultado' (salida C de la última prueba).
     while (1) { /* no retornar */ }
-}
+	}

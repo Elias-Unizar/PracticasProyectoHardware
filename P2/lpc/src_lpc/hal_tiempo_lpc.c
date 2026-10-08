@@ -17,7 +17,7 @@
 /* ---- Tick libre con T1 --------------------------------------------------- */
 static volatile uint32_t s_overflows_t1 = 0;  /* cuenta desbordes de T1 */
 
-void T1_ISR(void) __irq {
+void T1_ISR(void) __irq { //Subrutina de interrupción 
     /* Match0 al máximo para provocar overflow controlado */
     T1IR = 1;                  /* clear MR0 int */
     s_overflows_t1++;
@@ -33,7 +33,7 @@ void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
     T1MCR = 3;                 /* int + reset on MR0 */
     s_overflows_t1 = 0;
 
-    VICVectAddr1 = (unsigned long)T1_ISR;
+    VICVectAddr1 = (unsigned long)T1_ISR; //Llamada a subrutina de interrupción
     VICVectCntl1 = 0x20 | 5;   /* IRQ slot, fuente 5 = Timer1 */
     VICIntEnable |= (1u << 5);
 
@@ -74,7 +74,7 @@ static void (*s_cb)() = 0;		//puntero a funcion a llamar cuando salte la RSI (en
 void T0_ISR(void) __irq {
     if (s_cb) s_cb();						// Llamo a la función desde la RSI.
     T0IR = 1;										// Clear interrupt flag
-    VICVectAddr = 0;						// Acknowledge Interrupt
+    VICVectAddr = 0;						// Acknowledge Interrupt, sube prioridad de la interrupción del VICVectAddr
 }
 
 static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
@@ -88,16 +88,16 @@ static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
 }
 
 static void hal_tiempo_periodico_set_callback(void (*cb)()) {
-    s_cb = cb;
+    s_cb = cb; //Función que quiere que haga una función cuando pase una x cantidad de tiempo
 }
 
 static void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
-        VICIntEnable |= (1u << 4);
-        T0TCR = 2; T0TCR = 1;
+        VICIntEnable |= (1u << 4); //Permite que la fuente 4 sea una "interrupción válida"
+        T0TCR = 2; T0TCR = 1; //Resetea contador y lo inicia
     } else {
-        T0TCR = 0;
-        VICIntEnClr = (1u << 4);
+        T0TCR = 0; //Para contador
+        VICIntEnClr = (1u << 4); //Quita la interrupcion 4 como una válida
     }
 }
 

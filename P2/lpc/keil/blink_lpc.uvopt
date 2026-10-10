@@ -115,7 +115,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>17</nTsel>
+        <nTsel>0</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -132,7 +132,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGDARM</Key>
-          <Name>(134=-1,-1,-1,-1,0)(135=-1,-1,-1,-1,0)(107=-1,-1,-1,-1,0)(108=-1,-1,-1,-1,0)(106=-1,-1,-1,-1,0)(105=-1,-1,-1,-1,0)(80=-1,-1,-1,-1,0)(104=-1,-1,-1,-1,0)(100=863,190,1446,372,1)(113=-1,-1,-1,-1,0)(112=-1,-1,-1,-1,0)(136=-1,-1,-1,-1,0)(117=-1,-1,-1,-1,0)(110=-1,-1,-1,-1,0)(111=-1,-1,-1,-1,0)(114=-1,-1,-1,-1,0)(115=-1,-1,-1,-1,0)(116=-1,-1,-1,-1,0)</Name>
+          <Name>(134=-1,-1,-1,-1,0)(135=-1,-1,-1,-1,0)(107=-1,-1,-1,-1,0)(108=-1,-1,-1,-1,0)(106=-1,-1,-1,-1,0)(105=-1,-1,-1,-1,0)(80=-1,-1,-1,-1,0)(104=-1,-1,-1,-1,0)(100=947,168,1530,350,1)(113=-1,-1,-1,-1,0)(112=-1,-1,-1,-1,0)(136=-1,-1,-1,-1,0)(117=-1,-1,-1,-1,0)(110=861,317,1387,772,0)(111=978,314,1504,769,0)(114=-1,-1,-1,-1,0)(115=-1,-1,-1,-1,0)(116=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -149,15 +149,31 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>85</LineNumber>
+          <LineNumber>86</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>2660</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>&lt;1&gt;..\..\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>69</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>2716</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
           <Filename>&lt;1&gt;..\..\src\main.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>

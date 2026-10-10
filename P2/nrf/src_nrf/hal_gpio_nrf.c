@@ -36,8 +36,8 @@ void hal_gpio_sentido(HAL_GPIO_PIN_T gpio, hal_gpio_pin_dir_t direccion){
  */
 uint32_t hal_gpio_leer(HAL_GPIO_PIN_T gpio){
 	uint32_t mascaraPin = 1 << (gpio & 0x1F);
-	//Comprobamos en que puerto hay que cambiar el sentido
-	return ((NRF_GPIO->IN & mascaraPin) != 0);
+	//Comprobamos en que puerto hay q leer
+	return ((NRF_GPIO->OUT & mascaraPin) != 0);
 }
 
 /**

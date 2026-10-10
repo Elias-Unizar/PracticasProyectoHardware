@@ -53,6 +53,7 @@ static void blink_v1(LED_id_t id) {
  * para realizar en la segunda sesion de la practica, version a entregar
  */
 static void blink_v2(LED_id_t id) {
+		drv_tiempo_iniciar();
     Tiempo_ms_t siguiente_activacion;	
 
     /* Encender LED inicial */
@@ -64,7 +65,7 @@ static void blink_v2(LED_id_t id) {
     /* Bucle principal: conmutar con temporizador */
     while (true) {
         siguiente_activacion += RETARDO_MS;     /* calcular la siguiente activación */
-        drv_tiempo_esperar_hasta_ms(siguiente_activacion);
+        siguiente_activacion = drv_tiempo_esperar_hasta_ms(siguiente_activacion);
         (void)drv_led_conmutar(id);
 
         /* Aquí podrían añadirse otras tareas periódicas */
@@ -89,11 +90,11 @@ int main(void){
 	
 	if (Num_Leds > 0){
 			/* Sesión 1: parpadeo por lazo ocupado */
-			blink_v1((LED_id_t)1);
+			//blink_v1((LED_id_t)1);
 
-			/* Sesión 2: temporizador (cuando esté disponible)
-			 * // blink_v2((LED_id_t)2);
-			 */
+			// Sesión 2: temporizador (cuando esté disponible)
+			blink_v2((LED_id_t)2);
+			 
     }
 
     /* En sistemas empotrados normalmente no se retorna */

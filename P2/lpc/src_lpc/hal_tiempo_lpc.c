@@ -24,10 +24,19 @@ void T1_ISR(void) __irq {
     VICVectAddr = 0;
 }
 
+/*
+*
+*/
+void hal_tiempo_informacion(hal_tiempo_info_t *out_info){
+		out_info->ticks_per_us   = TICKS_PER_US;
+    out_info->counter_bits   = COUNTER_BITS;
+    out_info->counter_max    = COUNTER_MAX;
+}
+
 /* *****************************************************************************
  * Programa un contador de tick sobre Timer1, con maxima precisión y minimas interrupciones
  */
-void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
+void hal_tiempo_iniciar_tick() {
     /* Timer1 como free-running: cuenta hasta MAX y se “resetea” por match */
     T1MR0 = COUNTER_MAX;
     T1MCR = 3;                 /* int + reset on MR0 */
@@ -39,11 +48,6 @@ void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
 
     T1TCR = 2;  /* reset */
     T1TCR = 1;  /* start */
-
-    out_info->ticks_per_us   = TICKS_PER_US;
-    out_info->counter_bits   = COUNTER_BITS;
-    out_info->counter_max    = COUNTER_MAX;
-
 }
 
 /* Lectura 64-bit sin carrera: lee TC, luego overflows, re-lee TC si hizo wrap */
@@ -100,12 +104,6 @@ static void hal_tiempo_periodico_enable(bool enable) {
         VICIntEnClr = (1u << 4);
     }
 }
-
-//void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, 	void(*funcion_callback_drv)()){
-//	hal_tiempo_periodico_set_callback(funcion_callback_drv);
-//	hal_tiempo_periodico_config_tick(periodo_en_tick);
-//	hal_tiempo_periodico_enable();
-//}
 
 void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, void (*funcion_callback_drv)(void)){
     /* 1) Deshabilitar antes de tocar config/callback (evita ISR en mitad de cambios) */

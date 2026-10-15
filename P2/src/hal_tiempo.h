@@ -17,7 +17,6 @@ typedef struct {
     uint32_t counter_max;    /* (1u<<counter_bits)-1 */
 } hal_tiempo_info_t;
 
-void hal_tiempo_informacion(hal_tiempo_info_t *out_info);
 
 /**
  * Inicializa el contador libre (tick) y devuelve parámetros de conversión 
@@ -25,7 +24,7 @@ void hal_tiempo_informacion(hal_tiempo_info_t *out_info);
  * ticks_per_us permite pasar de los ticks del hardware a microsegundos
  * (tip, el driver lo necesitara para trabajar en us y ms de la app y hacer la conversion a ticks del hardware)
  */
-void hal_tiempo_iniciar_tick(void);
+void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info);
 
 /* Lectura del tick de 64 bits */
 uint64_t hal_tiempo_actual_tick64(void);

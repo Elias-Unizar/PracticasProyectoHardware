@@ -19,8 +19,7 @@ static hal_tiempo_info_t infoReloj = {0, 0, 0};
  * inicializa el reloj y empieza a contar
  */
 bool drv_tiempo_iniciar(){
-	hal_tiempo_informacion(&infoReloj);
-	hal_tiempo_iniciar_tick();
+	hal_tiempo_iniciar_tick(&infoReloj);
 	return true;
 }
 

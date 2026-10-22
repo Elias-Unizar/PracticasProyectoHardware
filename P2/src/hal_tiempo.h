@@ -41,6 +41,6 @@ void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, 	void(*funcion_ca
 //void hal_tiempo_periodico_set_callback(void (*cb)());
 
 /* Habilita/Deshabilita el reloj periódico */
-//void hal_tiempo_periodico_enable(bool enable);
+void hal_tiempo_periodico_enable(bool enable);
 
 #endif // HAL_TIEMPO

@@ -39,34 +39,36 @@ Tiempo_ms_t drv_tiempo_actual_ms(){
 	return ticksNow / (infoReloj.ticks_per_us * 1000);
 }
 
-static volatile bool esperaActiva;
-void dejarDeEsperar(){
-	esperaActiva = false;
-}
-
 /**
  * retardo: esperar un cierto tiempo en milisegundos
  */
 void drv_tiempo_esperar_ms(Tiempo_ms_t ms){
-	uint32_t tiempoTickExtra = ms*1000*infoReloj.ticks_per_us;
-	esperaActiva = true;
-	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, &dejarDeEsperar);
-	while(esperaActiva){}
+	uint64_t tiempoEsperarTick = ms*1000*infoReloj.ticks_per_us + hal_tiempo_actual_tick64();
+	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
 }
 
+Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
+	uint64_t tiempoEsperarTick = ms*1000*infoReloj.ticks_per_us;
+	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
+	return hal_tiempo_actual_tick64()/(infoReloj.ticks_per_us * 1000);
+}
+
+
+void drv_tiempo_esperar_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void)){
+	uint32_t tiempoTickExtra = ms*1000*infoReloj.ticks_per_us;
+	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, funcion_callback_drv);
+}
 /**
  * esperar hasta un determinado tiempo (en ms), devuelve el tiempo actual
  */
-Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
+Tiempo_ms_t drv_tiempo_esperar_hasta_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void)){
 	uint64_t tiempoReloj0 = hal_tiempo_actual_tick64(); //Es un tiempo total de ejecución, con overflows y demas
-	Tiempo_ms_t tiempoFallo = tiempoReloj0/(infoReloj.ticks_per_us * 1000);
 	uint64_t tiempoLimite = ms*1000*infoReloj.ticks_per_us;//Suponemos que el usuario no desbordaria cosas, de todas formas comprobamos
-	if(tiempoReloj0 > tiempoLimite) return tiempoFallo;//No podemos esperar, el tiempo limite es una poronga
-	esperaActiva = true;
-	uint64_t tiempoAEsperar = tiempoLimite - tiempoReloj0;
-	if(tiempoAEsperar > infoReloj.counter_max) return tiempoFallo;//Supera el limite de lo que nuestro contador puede detectar; Seguro hay mejoras... otras RSI mas robustas
-	//En este punto el tiempoAEsperar cabe en nuestro MatchRegister de 32bits
-	hal_tiempo_reloj_periodico_tick(tiempoAEsperar, &dejarDeEsperar);
-	while(esperaActiva){}
-	return ms;
+	uint32_t tiempoATranscurrir = tiempoLimite - tiempoReloj0;
+	hal_tiempo_reloj_periodico_tick(tiempoATranscurrir, funcion_callback_drv);
+	return hal_tiempo_actual_tick64()/(infoReloj.ticks_per_us * 1000);
+}
+
+void drv_tiempo_activarTimerNoPeriodico(bool activar){
+	hal_tiempo_periodico_enable(activar);
 }

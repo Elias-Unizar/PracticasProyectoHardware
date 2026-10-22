@@ -55,7 +55,7 @@ void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
 
 /* Lectura 64-bit sin carrera: lee TC, luego overflows, re-lee TC si hizo wrap */
 uint64_t hal_tiempo_actual_tick64(void) {
-    uint32_t hi1, lo1, hi2, lo2;
+    uint32_t hi1, hi2, lo2;
 
     hi1 = s_overflows_t0;
 		NRF_TIMER0->TASKS_CAPTURE[2] = 1;
@@ -84,8 +84,11 @@ static void (*s_cb)() = 0;		//puntero a funcion a llamar cuando salte la RSI (en
 void TIMER1_IRQHandler(void) __irq {
 		volatile uint32_t dummy;  
     if (NRF_TIMER1->EVENTS_COMPARE[0]) {
+									// Llamo a la función desde la RSI. Gracias a esto suponemos que pasan los 3? 5? ciclos que se exigen del timer
 			NRF_TIMER1->EVENTS_COMPARE[0] = 0;
-			if (s_cb) s_cb();						// Llamo a la función desde la RSI. Gracias a esto suponemos que pasan los 3? 5? ciclos que se exigen del timer
+			dummy = NRF_TIMER1->EVENTS_COMPARE[0];
+			dummy;
+			if (s_cb) s_cb();
 		}// Clear interrupt flag
 }
 
@@ -96,6 +99,8 @@ static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
     NRF_TIMER1->CC[0] = periodo_en_tick - 1u;
 		NRF_TIMER1->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
 		NRF_TIMER1->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
+		NRF_TIMER1->BITMODE = 3;
+		NRF_TIMER1->PRESCALER = 4 << TIMER_PRESCALER_PRESCALER_Pos;
     NVIC_EnableIRQ(TIMER1_IRQn);
 }
 
@@ -103,7 +108,7 @@ static void hal_tiempo_periodico_set_callback(void (*cb)()) {
     s_cb = cb;
 }
 
-static void hal_tiempo_periodico_enable(bool enable) {
+void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
         NVIC_EnableIRQ(TIMER1_IRQn);
         NRF_TIMER1->TASKS_START = 1;

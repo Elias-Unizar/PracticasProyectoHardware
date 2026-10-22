@@ -91,7 +91,7 @@ static void hal_tiempo_periodico_set_callback(void (*cb)()) {
     s_cb = cb; //Función que quiere que haga una función cuando pase una x cantidad de tiempo
 }
 
-static void hal_tiempo_periodico_enable(bool enable) {
+void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
         VICIntEnable |= (1u << 4); //Permite que la fuente 4 sea una "interrupción válida"
         T0TCR = 2; T0TCR = 1; //Resetea contador y lo inicia

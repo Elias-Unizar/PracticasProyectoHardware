@@ -41,7 +41,7 @@ static void blink_v1(LED_id_t id) {
 
 	drv_led_establecer(id, LED_ON);
     while (1) {
-        volatile uint32_t tmo = 20000000u;  /* ajustad para vuestro reloj */
+        volatile uint32_t tmo = 3333333u;/* ajustad para vuestro reloj */
         while (tmo--) { /* nop */ }
         (void)drv_led_conmutar(id);
     }
@@ -72,6 +72,25 @@ static void blink_v2(LED_id_t id) {
     }
 }
 
+
+void blink_v3_aux(){
+	volatile static int iteracion = 0;
+	drv_led_conmutar(3);
+	iteracion += 1;
+	if(iteracion > 100) drv_tiempo_activarTimerNoPeriodico(false);
+}
+
+static void blink_v3() {
+		drv_tiempo_iniciar();
+
+    /* Encender LED inicial */
+    drv_led_establecer(3, LED_ON);
+	
+		drv_tiempo_esperar_ms_no_monotono(RETARDO_MS, &blink_v3_aux);
+    /* Bucle principal: conmutar con temporizador */
+    while (true) {}
+}
+
 /* *****************************************************************************
  * MAIN, Programa principal.
  * para la primera sesion se debe usar la funcion de blink_v1 sin temporizadores
@@ -93,7 +112,9 @@ int main(void){
 			//blink_v1((LED_id_t)1);
 
 			// Sesión 2: temporizador (cuando esté disponible)
-			blink_v2((LED_id_t)2);
+			//blink_v2((LED_id_t)2);
+		
+			blink_v3();
 			 
     }
 

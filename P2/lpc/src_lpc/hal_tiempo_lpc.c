@@ -80,7 +80,6 @@ void T0_ISR(void) __irq {
 static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
     /* Config sin arrancar */
     T0TCR = 0;
-    if (periodo_en_tick == 0) return;
     T0MR0 = periodo_en_tick - 1u;
     T0MCR = 3; /* int + reset */
     VICVectAddr0 = (unsigned long)T0_ISR;
@@ -101,21 +100,21 @@ void hal_tiempo_periodico_enable(bool enable) {
     }
 }
 
-void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, void (*funcion_callback_drv)(void)){
+void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, void (*funcion_callback_drv)()){
     /* 1) Deshabilitar antes de tocar config/callback (evita ISR en mitad de cambios) */
-    hal_tiempo_periodico_enable(false);
+	hal_tiempo_periodico_enable(false);
 
     /* 2) Registrar callback (puede ser NULL si vamos a deshabilitar) */
-    hal_tiempo_periodico_set_callback(funcion_callback_drv);
+	hal_tiempo_periodico_set_callback(funcion_callback_drv);
 
     /* 3) Configurar periodo (no arranca el temporizador) */
-    hal_tiempo_periodico_config_tick(periodo_en_tick);
+	hal_tiempo_periodico_config_tick(periodo_en_tick);
 
     /* 4) Habilitar si hay periodo válido y callback no nulo; deshabilitar en caso contrario */
-    if (periodo_en_tick != 0u && funcion_callback_drv != NULL) {
-        hal_tiempo_periodico_enable(true);
-    } else {
-        hal_tiempo_periodico_enable(false);
-    }
+  if (periodo_en_tick != 0u && funcion_callback_drv != NULL) {
+		hal_tiempo_periodico_enable(true);
+  } else {
+    hal_tiempo_periodico_enable(false);
+  }
 }
 

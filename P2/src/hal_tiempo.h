@@ -33,7 +33,6 @@ uint64_t hal_tiempo_actual_tick64(void);
 /* --- Reloj periódico por IRQ --- */
 void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, 	void(*funcion_callback_drv)()); 
 
-
 /* Configura el periodo en ticks (no arranca) */
 //void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick);
 

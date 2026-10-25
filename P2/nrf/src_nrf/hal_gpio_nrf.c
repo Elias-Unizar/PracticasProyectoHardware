@@ -21,10 +21,25 @@ void hal_gpio_iniciar(void){
  * @param direccion HAL_GPIO_PIN_DIR_INPUT o HAL_GPIO_PIN_DIR_OUTPUT.
  */
 void hal_gpio_sentido(HAL_GPIO_PIN_T gpio, hal_gpio_pin_dir_t direccion){
-	//(((port) << 5) | ((pin) & 0x1F)) = gpio
 	uint32_t mascaraPin = 1 << (gpio & 0x1F); //Obtenemos el pin(direccion & 0x1F), y calculamos la posicion del uno en la mascara
-	//Yo pensaria que habria que comprobar en que puerto hay que cambiar el sentido
-	(direccion == HAL_GPIO_PIN_DIR_INPUT) ? (NRF_GPIO->DIRCLR = mascaraPin) : (NRF_GPIO->DIRSET = mascaraPin);
+	//(((port) << 5) | ((pin) & 0x1F)) = gpio
+	if (direccion == HAL_GPIO_PIN_DIR_INPUT){
+		NRF_GPIO->PIN_CNF[(gpio & 0x1F)] = ((GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) |
+																			(GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
+																			(GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos) |
+																			(GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos) |
+																			(GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos)
+																			);
+	}else{
+		NRF_GPIO->PIN_CNF[(gpio & 0x1F)] = ((GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) | //SE PUEDE AHORRAR ENERGIA QUITANDO ESTO
+																			(GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
+																			(GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos) |
+																			(GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos) |
+																			(GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos)
+																			);
+	}
+	
+
 
 }
 
@@ -37,7 +52,7 @@ void hal_gpio_sentido(HAL_GPIO_PIN_T gpio, hal_gpio_pin_dir_t direccion){
 uint32_t hal_gpio_leer(HAL_GPIO_PIN_T gpio){
 	uint32_t mascaraPin = 1 << (gpio & 0x1F);
 	//Comprobamos en que puerto hay q leer
-	return ((NRF_GPIO->OUT & mascaraPin) != 0);
+	return ((NRF_GPIO->IN & mascaraPin) != 0);
 }
 
 /**

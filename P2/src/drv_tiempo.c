@@ -43,32 +43,17 @@ Tiempo_ms_t drv_tiempo_actual_ms(){
  * retardo: esperar un cierto tiempo en milisegundos
  */
 void drv_tiempo_esperar_ms(Tiempo_ms_t ms){
-	uint64_t tiempoEsperarTick = ms*1000*infoReloj.ticks_per_us + hal_tiempo_actual_tick64();
+	uint64_t tiempoEsperarTick = (uint64_t)ms*1000*infoReloj.ticks_per_us + hal_tiempo_actual_tick64();
 	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
 }
-
+(uint64_t)
 Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
-	uint64_t tiempoEsperarTick = ms*1000*infoReloj.ticks_per_us;
+	uint64_t tiempoEsperarTick = (uint64_t)ms*1000*infoReloj.ticks_per_us;
 	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
 	return hal_tiempo_actual_tick64()/(infoReloj.ticks_per_us * 1000);
 }
 
-
-void drv_tiempo_esperar_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void)){
-	uint32_t tiempoTickExtra = ms*1000*infoReloj.ticks_per_us;
+void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_drv)(), uint32_t ID_evento){
+	uint32_t tiempoTickExtra = (uint32_t)((uint64_t)ms*1000*infoReloj.ticks_per_us);
 	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, funcion_callback_drv);
-}
-/**
- * esperar hasta un determinado tiempo (en ms), devuelve el tiempo actual
- */
-Tiempo_ms_t drv_tiempo_esperar_hasta_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void)){
-	uint64_t tiempoReloj0 = hal_tiempo_actual_tick64(); //Es un tiempo total de ejecución, con overflows y demas
-	uint64_t tiempoLimite = ms*1000*infoReloj.ticks_per_us;//Suponemos que el usuario no desbordaria cosas, de todas formas comprobamos
-	uint32_t tiempoATranscurrir = tiempoLimite - tiempoReloj0;
-	hal_tiempo_reloj_periodico_tick(tiempoATranscurrir, funcion_callback_drv);
-	return hal_tiempo_actual_tick64()/(infoReloj.ticks_per_us * 1000);
-}
-
-void drv_tiempo_activarTimerNoPeriodico(bool activar){
-	hal_tiempo_periodico_enable(activar);
 }

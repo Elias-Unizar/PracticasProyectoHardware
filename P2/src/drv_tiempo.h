@@ -26,7 +26,5 @@ void drv_tiempo_esperar_ms(Tiempo_ms_t ms);
 /* Esperar hasta (deadline en ms). Devuelve el tiempo actual tras la espera. */
 Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t deadline_ms);
 
-void drv_tiempo_activarTimerNoPeriodico(bool activar);
-Tiempo_ms_t drv_tiempo_esperar_hasta_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void));
-void drv_tiempo_esperar_ms_no_monotono(Tiempo_ms_t ms, void (*funcion_callback_drv)(void));
+void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_drv)(), uint32_t ID_evento);
 #endif // DRV_TIEMPO_H

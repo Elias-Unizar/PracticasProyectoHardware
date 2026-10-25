@@ -9,7 +9,7 @@
 #include <stdbool.h>  // si usas bool/true/false
 #include <stddef.h>   // define NULL
 
-#define PCLK_MHZ          1u
+#define PCLK_MHZ          16u
 #define TICKS_PER_US      PCLK_MHZ
 #define COUNTER_BITS      32u
 #define COUNTER_MAX       (0xFFFFFFFFu)
@@ -33,10 +33,10 @@ void TIMER0_IRQHandler(void) __irq {
  */
 void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
 		//Si se quiere cambiar a que sea de 32 bits, con otra frecuencia etc... hacerlo antes de recabar la informacion del clock
-		NRF_TIMER0->BITMODE    = 3;//0 = 16bits, 1 = 8bits, 2 = 24bits, 3 = 32bits
+		NRF_TIMER0->BITMODE = TIMER_BITMODE_BITMODE_32Bit << TIMER_BITMODE_BITMODE_Pos;
 		out_info->counter_bits = COUNTER_BITS;
     out_info->counter_max  = COUNTER_MAX;
-		NRF_TIMER0->PRESCALER  = 4 << TIMER_PRESCALER_PRESCALER_Pos; //fclock = 16MHz / 2^Prescaler ---> 16Mhz / 16
+		NRF_TIMER0->PRESCALER  = 0 << TIMER_PRESCALER_PRESCALER_Pos; //fclock = 16MHz / 2^Prescaler ---> 16Mhz / 16
 		out_info->ticks_per_us = TICKS_PER_US;
 	
 		s_overflows_t0 = 0;
@@ -100,7 +100,7 @@ static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
 		NRF_TIMER1->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
 		NRF_TIMER1->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
 		NRF_TIMER1->BITMODE = 3;
-		NRF_TIMER1->PRESCALER = 4 << TIMER_PRESCALER_PRESCALER_Pos;
+		NRF_TIMER1->PRESCALER = 0 << TIMER_PRESCALER_PRESCALER_Pos;
     NVIC_EnableIRQ(TIMER1_IRQn);
 }
 

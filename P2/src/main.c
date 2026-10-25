@@ -24,6 +24,7 @@
 #include "hal_gpio.h"
 #include "drv_leds.h"
 #include "drv_tiempo.h"
+#include "drv_consumo.h"
 
 /* Constante de retardo en milisegundos */
 #define RETARDO_MS 500u 		 /* ejemplo: medio segundo */
@@ -73,23 +74,36 @@ static void blink_v2(LED_id_t id) {
 }
 
 
-void blink_v3_aux(){
+void myblink_v3_aux(){
 	volatile static int iteracion = 0;
 	drv_led_conmutar(3);
 	iteracion += 1;
-	if(iteracion > 100) drv_tiempo_activarTimerNoPeriodico(false);
 }
 
-static void blink_v3() {
+static void myblink_v3() {
 		drv_tiempo_iniciar();
 
     /* Encender LED inicial */
     drv_led_establecer(3, LED_ON);
 	
-		drv_tiempo_esperar_ms_no_monotono(RETARDO_MS, &blink_v3_aux);
+		drv_tiempo_periodico_ms(RETARDO_MS, &myblink_v3_aux, 0);
     /* Bucle principal: conmutar con temporizador */
     while (true) {}
 }
+
+void leds_c(uint32_t id, uint32_t ms){
+	drv_led_conmutar(3);
+}
+
+static void blink_v3(LED_id_t id){
+  /* Encender LED inicial */
+  drv_led_establecer(id, LED_ON);
+	drv_tiempo_periodico_ms(RETARDO_MS, &leds_c, id);
+	while(true){
+		drv_consumo_esperar();
+	}
+}
+
 
 /* *****************************************************************************
  * MAIN, Programa principal.
@@ -103,7 +117,8 @@ int main(void){
 //	bool error = drv_tiempo_iniciar(); // para la sesion 2 de practica 2
 	
 	hal_gpio_iniciar();	// llamamos a iniciar gpio antesde que lo hagan los drivers
-	
+	drv_tiempo_iniciar();
+	drv_consumo_iniciar(1);
 	/* Configurar LEDs (IDs válidos: 1..num_leds) */
 	Num_Leds = drv_leds_iniciar();
 	
@@ -114,7 +129,9 @@ int main(void){
 			// Sesión 2: temporizador (cuando esté disponible)
 			//blink_v2((LED_id_t)2);
 		
-			blink_v3();
+			//myblink_v3();
+			
+			blink_v3((LED_id_t)3);
 			 
     }
 

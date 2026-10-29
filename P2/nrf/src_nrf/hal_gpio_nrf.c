@@ -21,7 +21,7 @@ void hal_gpio_iniciar(void){
  * @param direccion HAL_GPIO_PIN_DIR_INPUT o HAL_GPIO_PIN_DIR_OUTPUT.
  */
 void hal_gpio_sentido(HAL_GPIO_PIN_T gpio, hal_gpio_pin_dir_t direccion){
-	uint32_t mascaraPin = 1 << (gpio & 0x1F); //Obtenemos el pin(direccion & 0x1F), y calculamos la posicion del uno en la mascara
+	//uint32_t mascaraPin = 1 << (gpio & 0x1F); //Obtenemos el pin(direccion & 0x1F), y calculamos la posicion del uno en la mascara
 	//(((port) << 5) | ((pin) & 0x1F)) = gpio
 	if (direccion == HAL_GPIO_PIN_DIR_INPUT){
 		NRF_GPIO->PIN_CNF[(gpio & 0x1F)] = ((GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) |

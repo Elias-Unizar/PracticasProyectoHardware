@@ -46,7 +46,7 @@ void drv_tiempo_esperar_ms(Tiempo_ms_t ms){
 	uint64_t tiempoEsperarTick = (uint64_t)ms*1000*infoReloj.ticks_per_us + hal_tiempo_actual_tick64();
 	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
 }
-(uint64_t)
+
 Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
 	uint64_t tiempoEsperarTick = (uint64_t)ms*1000*infoReloj.ticks_per_us;
 	while (hal_tiempo_actual_tick64() < tiempoEsperarTick){;}
@@ -54,6 +54,6 @@ Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
 }
 
 void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_drv)(), uint32_t ID_evento){
-	uint32_t tiempoTickExtra = (uint32_t)((uint64_t)ms*1000*infoReloj.ticks_per_us);
+	uint32_t tiempoTickExtra = ms*1000*infoReloj.ticks_per_us;
 	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, funcion_callback_drv);
 }

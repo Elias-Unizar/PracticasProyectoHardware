@@ -422,21 +422,6 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\board.h</FilePath>
             </File>
-            <File>
-              <FileName>drv_consumo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\drv_consumo.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_consumo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\hal_consumo.h</FilePath>
-            </File>
-            <File>
-              <FileName>drv_consumo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\drv_consumo.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

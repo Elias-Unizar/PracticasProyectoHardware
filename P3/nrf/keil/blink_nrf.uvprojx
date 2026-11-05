@@ -462,6 +462,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\rt_fifo.h</FilePath>
             </File>
+            <File>
+              <FileName>mod_tests.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\mod_tests.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

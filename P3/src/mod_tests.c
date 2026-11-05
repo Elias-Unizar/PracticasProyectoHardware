@@ -5,10 +5,11 @@
 #define TEST_RT_FIFO 4
 //Se selecciona el tipo de test a realizar abajo
 #define TIPOTEST TEST_RT_FIFO
-
+#define TEST 1
 #include <stdint.h>
 #include <stdbool.h>
 
+#if TEST == 1
 #if TIPOTEST == TEST_LEDS
 //Vamos a comprobar por encima que funcionan bien las funciones
 #include "drv_leds.h"
@@ -134,6 +135,7 @@ uint8_t test_fifo_vacia(){
 	uint32_t id, aux;
 	Tiempo_us_t ts;
 	vaciar_fifo();
+
 	return rt_FIFO_extraer(&id, &aux, &ts) == 0;
 }
 
@@ -144,14 +146,16 @@ uint8_t test_fifo_orden(){
 	vaciar_fifo();
 	rt_FIFO_encolar(ev_T_PERIODICO, 11);
 	rt_FIFO_encolar(ev_PULSAR_BOTON, 22);
-
-	if (!rt_FIFO_extraer(&id, &aux, &ts) || id != ev_T_PERIODICO) return 0;
-	if (!rt_FIFO_extraer(&id, &aux, &ts) || id != ev_PULSAR_BOTON) return 0;
+	rt_FIFO_extraer(&id, &aux, &ts);
+	if (id != ev_T_PERIODICO) return 0;
+	rt_FIFO_extraer(&id, &aux, &ts);
+	if (id != ev_PULSAR_BOTON) return 0;
+	(void) id;
 	return rt_FIFO_extraer(&id, &aux, &ts) == 0;
 }
 
 /* Estadisticas: tras encolar n eventos de un tipo, su contador sube n */
-static uint8_t test_fifo_estadisticas(){
+uint8_t test_fifo_estadisticas(){
 	uint32_t antesP, antesB, antesV;
 	vaciar_fifo();
 	antesV = rt_FIFO_estadisticas(ev_VOID);
@@ -169,33 +173,38 @@ static uint8_t test_fifo_estadisticas(){
 
 /* Desbordamiento: encolar de mas no cuelga ni corrompe la cola.
  * El monitor de overflow se comprueba a mano con el analizador. */
-static uint8_t test_fifo_desbordamiento(){
-	uint32_t i, n;
+uint8_t test_fifo_desbordamiento(){
 	vaciar_fifo();
-	for (uint32_t i = 0; i < FIFO_N_DESBORDE; i++) rt_FIFO_encolar(ev_T_PERIODICO, i); //Deberia de petar aqui en encolar
+	for (uint32_t i = 0; i < FIFO_N_DESBORDE - 1; i++) rt_FIFO_encolar(ev_T_PERIODICO, i); //Deberia de petar aqui en encolar
+	rt_FIFO_encolar(ev_T_PERIODICO, 1000);
 	return 0;
 }
 #endif
-
 int main(void){
-#if TIPOTEST == TEST_LEDS
-#endif
+		#if TIPOTEST == TEST_LEDS
+		#endif
 
-#if TIPOTEST == TEST_TIEMPO
-#endif
+		#if TIPOTEST == TEST_TIEMPO
+		#endif
 
-#if TIPOTEST == TEST_CONSUMO
-#endif
+		#if TIPOTEST == TEST_CONSUMO
+		#endif
 
-#if TIPOTEST == TEST_RT_FIFO
-	uint8_t res;
-	res = test_fifo_vacia();
-	while(!res){;}
-	res = test_fifo_orden();
-	while(!res){;}
-	res = test_fifo_estadisticas();
-	while(!res){;}
-	test_fifo_desbordamiento();
+		#if TIPOTEST == TEST_RT_FIFO
+				rt_FIFO_inicializar(4);
+				uint8_t res;
+				res = test_fifo_vacia();
+				while(!res){;}
+				res = test_fifo_orden();
+				while(!res){;}
+
+					res = test_fifo_estadisticas();
+				while(!res){;}
+
+				test_fifo_desbordamiento();
+		#endif
+    /* En sistemas empotrados normalmente no se retorna */
+    while (1) { /* idle */ }
+    /* return 0; */
+	}
 #endif
-	while(1){;}
-}

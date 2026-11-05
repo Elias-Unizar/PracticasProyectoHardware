@@ -31,6 +31,7 @@ void rt_FIFO_encolar(uint32_t ID_evento, uint32_t auxData){
 		EVENTO eventoAInsertar = {ID_evento, auxData, eventoTS};
 		ev_FIFO[ultimo_insertado] = eventoAInsertar;
 		veces_ejecutadas_EVENTO_T[ID_evento] += 1;
+		veces_ejecutadas_EVENTO_T[ev_VOID] += 1;
 	}else{
 		drv_monitor_marcar(overflowMonitor);
 		while(1){;}
@@ -43,6 +44,7 @@ uint8_t rt_FIFO_extraer(uint32_t *ID_evento, uint32_t* auxData, Tiempo_us_t *TS)
 	*auxData = ev_FIFO[siguiente_a_tratar].auxData;
 	*TS = ev_FIFO[siguiente_a_tratar].TS;
 	tamagnoActualCola -= 1;
+	siguiente_a_tratar += 1;
 	return tamagnoActualCola+1; //
 }
 

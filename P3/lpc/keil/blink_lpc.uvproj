@@ -504,7 +504,7 @@
             <File>
               <FileName>mod_tests.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\mod_tests.c</FilePath>
+              <FilePath>..\..\src\mod_tests.c</FilePath>
             </File>
           </Files>
         </Group>

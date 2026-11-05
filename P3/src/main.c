@@ -18,6 +18,10 @@
  * Universidad de Zaragoza
  * ****************************************************************************/
 #define VERSION_BLINK_EJECUTAR 4
+
+
+#define TEST 1
+//0 no, 1 si
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -31,6 +35,8 @@
 /* Constante de retardo en milisegundos */
 #define RETARDO_MS 500u 		 /* ejemplo: medio segundo */
 
+#if TEST == 0
+	
 #if VERSION_BLINK_EJECUTAR == 1
 /* *****************************************************************************
  * BLINK v1: parpadeo de un LED conmutando on/off.
@@ -150,8 +156,8 @@ int main(void){
 			blink_v4((LED_id_t)4);
 			#endif
     }
-
     /* En sistemas empotrados normalmente no se retorna */
     while (1) { /* idle */ }
     /* return 0; */
 }
+#endif

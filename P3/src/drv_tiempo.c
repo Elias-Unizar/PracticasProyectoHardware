@@ -7,11 +7,21 @@
  
 #include "drv_tiempo.h"
 #include "hal_tiempo.h"
+#include <stddef.h>   // define NULL
 
 static hal_tiempo_info_t infoReloj = {0, 0, 0};
 
 static hal_tiempo_info_t infoRelojPer = {0, 0, 0};
 
+
+#ifdef TEST_TIEMPO
+#include "hal_tiempo.h"
+void drv_tiempo_info_relojes(hal_tiempo_info_t *out_info_mon, hal_tiempo_info_t *out_info_per){
+	out_info_mon = &infoReloj;
+	out_info_per ) &infoRelojPer;
+}
+
+#endif
 /*
     uint32_t ticks_per_us;    ticks de HW por microsegundo (p.ej., 15 a 15 MHz) 
     uint8_t  counter_bits;    ancho del contador libre (p.ej., 32) 
@@ -24,7 +34,7 @@ static hal_tiempo_info_t infoRelojPer = {0, 0, 0};
 bool drv_tiempo_iniciar(){
 	hal_tiempo_iniciar_tick(&infoReloj);
 	hal_tiempo_iniciar_tick_periodico(&infoRelojPer);
-	return true;
+	return infoReloj.ticks_per_us != 0 && infoRelojPer.ticks_per_us != 0;
 }
 
 /**
@@ -57,19 +67,22 @@ Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t ms){
 	return hal_tiempo_actual_tick64()/(infoReloj.ticks_per_us * 1000);
 }
 
-static void (*app_cb)(uint32_t ID) = 0;
-static uint32_t param1;
+static void (*app_cb)(uint32_t) = 0;
+static uint32_t param_interno; //ID_evento
+
 void funcion_callback_drv(){
-	if (app_cb != 0){
-		app_cb(param1);
-	}
+	app_cb(param_interno);
+}
+
+void drv_tiempo_registrar_callback(void (*funcion_callback)(), uint32_t param1){
+	app_cb = funcion_callback;
+	param_interno = param1;
 }
 
 void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_app)(), uint32_t ID_evento){
 	uint32_t tiempoTickExtra = ms*1000*infoRelojPer.ticks_per_us;
-	
-	app_cb = funcion_callback_app;
-	param1 = ID_evento;
+		
+	drv_tiempo_registrar_callback(funcion_callback_app, ID_evento);
 	
 	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, funcion_callback_drv);
 }

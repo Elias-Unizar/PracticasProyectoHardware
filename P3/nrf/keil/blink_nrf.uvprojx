@@ -447,6 +447,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\src\drv_monitor.c</FilePath>
             </File>
+            <File>
+              <FileName>rt_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\rt_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt_evento_t.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\rt_evento_t.h</FilePath>
+            </File>
+            <File>
+              <FileName>rt_fifo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\rt_fifo.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

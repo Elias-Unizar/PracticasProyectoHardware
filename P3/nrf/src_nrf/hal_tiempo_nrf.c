@@ -112,7 +112,6 @@ void hal_tiempo_iniciar_tick_periodico(hal_tiempo_info_t *out_info_per){
 	  NRF_TIMER1->TASKS_STOP = 1;
 		NRF_TIMER1->BITMODE = TIMER_BITMODE_BITMODE_32Bit;
 		NRF_TIMER1->PRESCALER = 4 << TIMER_PRESCALER_PRESCALER_Pos;
-    NVIC_EnableIRQ(TIMER1_IRQn);
 	
 		out_info_per->counter_bits = 32;
 		out_info_per->counter_max = 0xFFFFFFFF;

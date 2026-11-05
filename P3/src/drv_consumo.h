@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef uint8_t Monitor_id_t;
+typedef uint32_t Monitor_id_t;
 
-void drv_consumo_iniciar(Monitor_id_t monitorConsumo);
+void drv_consumo_iniciar(Monitor_id_t monitorConsumoEsperar, Monitor_id_t monitorConsumoDormir);
 
 
 void drv_consumo_esperar(void);

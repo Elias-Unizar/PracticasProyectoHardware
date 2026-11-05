@@ -17,7 +17,7 @@
  * Autores: Enrique Torrs
  * Universidad de Zaragoza
  * ****************************************************************************/
-
+#define VERSION_BLINK_EJECUTAR 4
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -26,20 +26,18 @@
 #include "drv_tiempo.h"
 #include "drv_consumo.h"
 #include "drv_monitor.h"
+#include "rt_fifo.h"
 
 /* Constante de retardo en milisegundos */
 #define RETARDO_MS 500u 		 /* ejemplo: medio segundo */
 
-/* Prototipos */
-static void blink_v1(LED_id_t id);
-static void blink_v2(LED_id_t id);
-
+#if VERSION_BLINK_EJECUTAR == 1
 /* *****************************************************************************
  * BLINK v1: parpadeo de un LED conmutando on/off.
  * Retardo por bucle de instrucciones (busy-wait). Solo usa el driver de LEDs.
  * para realizar la primera sesión de la practica
  */
-static void blink_v1(LED_id_t id) {
+void blink_v1(LED_id_t id) {
 
 	drv_led_establecer(id, LED_ON);
     while (1) {
@@ -48,13 +46,15 @@ static void blink_v1(LED_id_t id) {
         (void)drv_led_conmutar(id);
     }
 }
+#endif
 
+#if VERSION_BLINK_EJECUTAR == 2
 /* *****************************************************************************
  * BLINK v2, parpadeo de un led conmutando on/off 
  * activacion por tiempo, usa tanto manejador del led como el del tiempo
  * para realizar en la segunda sesion de la practica, version a entregar
  */
-static void blink_v2(LED_id_t id) {
+void blink_v2(LED_id_t id) {
 		drv_tiempo_iniciar();
     Tiempo_ms_t siguiente_activacion;	
 
@@ -73,13 +73,14 @@ static void blink_v2(LED_id_t id) {
         /* Aquí podrían añadirse otras tareas periódicas */
     }
 }
+#endif
 
-
+#if VERSION_BLINK_EJECUTAR == 3
 void leds_c(uint32_t id){
 	drv_led_conmutar(id);
 }
 
-static void blink_v3(LED_id_t id){
+void blink_v3(LED_id_t id){
   /* Encender LED inicial */
   drv_led_establecer(id, LED_ON);
 	drv_tiempo_periodico_ms(RETARDO_MS, &leds_c, id);
@@ -87,7 +88,25 @@ static void blink_v3(LED_id_t id){
 		drv_consumo_esperar();
 	}
 }
+#endif
 
+#if VERSION_BLINK_EJECUTAR == 4
+void blink_v4(LED_id_t id){
+	drv_led_establecer(id, LED_ON);
+	drv_tiempo_periodico_ms(500, rt_FIFO_encolar, ev_T_PERIODICO);
+	
+	uint32_t EV_ID_evento;
+	uint32_t EV_auxData;
+	Tiempo_us_t EV_TS;
+	while(1){
+		if(rt_FIFO_extraer(&EV_ID_evento, &EV_auxData, &EV_TS)){
+			if(ev_T_PERIODICO) drv_led_conmutar(id);
+		}else{
+			drv_consumo_esperar();
+		}
+	}
+}
+#endif
 
 /* *****************************************************************************
  * MAIN, Programa principal.
@@ -108,17 +127,28 @@ int main(void){
 	/*Inicializa primero los monitores, son como LEDS*/
 	drv_monitor_iniciar();
 	/*Inicializa los registtos de manera adecuada para que ademas del drv_esperar funcione el drv_dormir*/
-	drv_consumo_iniciar((Monitor_id_t)3);//Para debug le añadimos el monitor 3
+	drv_consumo_iniciar((Monitor_id_t)3, 2);//Para debug le añadimos el monitor 3
 	
+	rt_FIFO_inicializar((Monitor_id_t)4);
 	if (Num_Leds > 0){
+			#if VERSION_BLINK_EJECUTAR == 1
 			/* Sesión 1: parpadeo por lazo ocupado */
-			//blink_v1((LED_id_t)1);
-
+			blink_v1((LED_id_t)1);
+			#endif
+			#if VERSION_BLINK_EJECUTAR == 2
 			// Sesión 2: temporizador (cuando esté disponible)
-			//blink_v2((LED_id_t)2);
+			blink_v2((LED_id_t)2);
+			#endif
 			
+			#if VERSION_BLINK_EJECUTAR == 3
+			// Sesión 1: Practica 3
 			blink_v3((LED_id_t)3);
-			 
+			#endif
+		
+			#if VERSION_BLINK_EJECUTAR == 4
+			// Sesión 2: Practica 3
+			blink_v4((LED_id_t)4);
+			#endif
     }
 
     /* En sistemas empotrados normalmente no se retorna */

@@ -41,7 +41,7 @@ static void blink_v1(LED_id_t id) {
 
 	drv_led_establecer(id, LED_ON);
     while (1) {
-        volatile uint32_t tmo = 3333333u;/* ajustad para vuestro reloj */
+			volatile uint32_t tmo = 1111109u;/* ajustad para vuestro reloj: 3333333u LPC;  */
         while (tmo--) { /* nop */ }
         (void)drv_led_conmutar(id);
     }

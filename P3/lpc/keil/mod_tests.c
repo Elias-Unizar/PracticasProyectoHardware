@@ -169,18 +169,16 @@ static uint8_t test_fifo_estadisticas(){
 
 /* Desbordamiento: encolar de mas no cuelga ni corrompe la cola.
  * El monitor de overflow se comprueba a mano con el analizador. */
-static uint8_t test_fifo_desbordamiento(void){
+static uint8_t test_fifo_desbordamiento(){
 	uint32_t i, n;
 	vaciar_fifo();
-	for (i = 0; i < FIFO_N_DESBORDE; i++) rt_FIFO_encolar(ev_T_PERIODICO, i);
-	n = vaciar_fifo();
-	return (n > 0u) && (n <= FIFO_N_DESBORDE);
+	for (uint32_t i = 0; i < FIFO_N_DESBORDE; i++) rt_FIFO_encolar(ev_T_PERIODICO, i); //Deberia de petar aqui en encolar
+	return 0;
 }
 #endif
 
 int main(void){
 #if TIPOTEST == TEST_LEDS
-
 #endif
 
 #if TIPOTEST == TEST_TIEMPO
@@ -190,6 +188,14 @@ int main(void){
 #endif
 
 #if TIPOTEST == TEST_RT_FIFO
+	uint8_t res;
+	res = test_fifo_vacia();
+	while(!res){;}
+	res = test_fifo_orden();
+	while(!res){;}
+	res = test_fifo_estadisticas();
+	while(!res){;}
+	test_fifo_desbordamiento();
 #endif
 	while(1){;}
 }

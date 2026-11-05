@@ -27,7 +27,7 @@ void rt_FIFO_encolar(uint32_t ID_evento, uint32_t auxData){
 	tamagnoActualCola += 1;
 	if(tamagnoActualCola <= MAX_EVENTOS){
 		Tiempo_us_t eventoTS = drv_tiempo_actual_us();
-		ultimo_insertado = uint8_t(ultimo_insertado + 1) % MAX_EVENTOS;
+		ultimo_insertado = (ultimo_insertado + 1) % MAX_EVENTOS;
 		EVENTO eventoAInsertar = {ID_evento, auxData, eventoTS};
 		ev_FIFO[ultimo_insertado] = eventoAInsertar;
 		veces_ejecutadas_EVENTO_T[ID_evento] += 1;

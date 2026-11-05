@@ -4,7 +4,7 @@
 #define TEST_CONSUMO 3 //Tests manuales, en los que comprobar
 #define TEST_RT_FIFO 4
 //Se selecciona el tipo de test a realizar abajo
-#define TIPOTEST TEST_TIEMPO
+#define TIPOTEST TEST_RT_FIFO
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -114,6 +114,68 @@ uint8_t test_consumo_esperar(){
 #endif
 
 #if TIPOTEST == TEST_RT_FIFO
+#include "hal_gpio.h"
+#include "drv_monitor.h"
+#include "drv_tiempo.h"
+#include "rt_fifo.h"
+
+#define FIFO_N_DESBORDE 33u   /* mayor que la capacidad de tu FIFO */
+
+/* Vacia la FIFO y devuelve cuantos eventos habia */
+uint32_t vaciar_fifo(){
+	uint32_t id, aux, n = 0;
+	Tiempo_us_t ts;
+	while (rt_FIFO_extraer(&id, &aux, &ts) && n < 100000u) n++;
+	return n;
+}
+
+/* FIFO vacia -> extraer devuelve 0 */
+uint8_t test_fifo_vacia(){
+	uint32_t id, aux;
+	Tiempo_us_t ts;
+	vaciar_fifo();
+	return rt_FIFO_extraer(&id, &aux, &ts) == 0;
+}
+
+/* Orden FIFO y datos intactos */
+uint8_t test_fifo_orden(){
+	uint32_t id, aux;
+	Tiempo_us_t ts;
+	vaciar_fifo();
+	rt_FIFO_encolar(ev_T_PERIODICO, 11);
+	rt_FIFO_encolar(ev_PULSAR_BOTON, 22);
+
+	if (!rt_FIFO_extraer(&id, &aux, &ts) || id != ev_T_PERIODICO) return 0;
+	if (!rt_FIFO_extraer(&id, &aux, &ts) || id != ev_PULSAR_BOTON) return 0;
+	return rt_FIFO_extraer(&id, &aux, &ts) == 0;
+}
+
+/* Estadisticas: tras encolar n eventos de un tipo, su contador sube n */
+static uint8_t test_fifo_estadisticas(){
+	uint32_t antesP, antesB, antesV;
+	vaciar_fifo();
+	antesV = rt_FIFO_estadisticas(ev_VOID);
+	antesP = rt_FIFO_estadisticas(ev_T_PERIODICO);
+	antesB = rt_FIFO_estadisticas(ev_PULSAR_BOTON);
+	for (uint32_t i = 0; i < 3; i++) rt_FIFO_encolar(ev_T_PERIODICO, i);
+	rt_FIFO_encolar(ev_PULSAR_BOTON, 0);
+
+	if (rt_FIFO_estadisticas(ev_T_PERIODICO) - antesP != 3u) return 0;
+	if (rt_FIFO_estadisticas(ev_PULSAR_BOTON) - antesB != 1u) return 0;
+	if (rt_FIFO_estadisticas(ev_VOID) - antesV != 4u) return 0;
+	vaciar_fifo();
+	return 1;
+}
+
+/* Desbordamiento: encolar de mas no cuelga ni corrompe la cola.
+ * El monitor de overflow se comprueba a mano con el analizador. */
+static uint8_t test_fifo_desbordamiento(void){
+	uint32_t i, n;
+	vaciar_fifo();
+	for (i = 0; i < FIFO_N_DESBORDE; i++) rt_FIFO_encolar(ev_T_PERIODICO, i);
+	n = vaciar_fifo();
+	return (n > 0u) && (n <= FIFO_N_DESBORDE);
+}
 #endif
 
 int main(void){

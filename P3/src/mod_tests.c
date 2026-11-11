@@ -5,7 +5,7 @@
 #define TEST_RT_FIFO 4
 //Se selecciona el tipo de test a realizar abajo
 #define TIPOTEST TEST_RT_FIFO
-#define TEST 1
+#define TEST 0
 #include <stdint.h>
 #include <stdbool.h>
 

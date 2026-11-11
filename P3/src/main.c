@@ -20,7 +20,7 @@
 #define VERSION_BLINK_EJECUTAR 4
 
 
-#define TEST 1
+#define TEST 0
 //0 no, 1 si
 #include <stdint.h>
 #include <stdbool.h>

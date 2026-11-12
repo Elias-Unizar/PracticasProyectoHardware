@@ -10,7 +10,7 @@ err_t svc_alarma_iniciar(void (*cb_a_llamar)());
 
 uint32_t svc_alarma_codificar(bool periodico, Tiempo_ms_t retardo_ms, uint8_t flags);
 
-void  svc_alarma_activar(uint32_t alarma_flags, EVENTO_T ID_evento, uint32_t auxData);
+err_t svc_alarma_activar(uint32_t alarma_flags, EVENTO_T ID_evento, uint32_t auxData);
 
 void svc_alarma_actualizar(EVENTO_T evento, uint32_t aux);
 

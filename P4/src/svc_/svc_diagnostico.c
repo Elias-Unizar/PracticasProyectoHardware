@@ -35,7 +35,7 @@ CANAL_T svc_DIAGNOSTICO_reservar(){
 			return (CANAL_T)monitor;
 		}
 	}
-	return 0;//O sin canales, o sin iniciar
+	return -1;//O sin canales, o sin iniciar
 }
 
 err_t svc_DIAGNOSTICO_desreservar(CANAL_T canal){

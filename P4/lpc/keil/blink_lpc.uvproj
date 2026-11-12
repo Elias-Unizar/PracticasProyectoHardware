@@ -377,7 +377,7 @@
               <MiscControls></MiscControls>
               <Define>LPC2105_simulador</Define>
               <Undefine></Undefine>
-              <IncludePath>../../src;../src_lpc</IncludePath>
+              <IncludePath>../../src;../src_lpc;../../src/drv_;../../src/hal_h;../../src/svc_</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -427,34 +427,9 @@
               <FilePath>..\..\src\main.c</FilePath>
             </File>
             <File>
-              <FileName>drv_leds.c</FileName>
+              <FileName>rt_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\src\drv_leds.c</FilePath>
-            </File>
-            <File>
-              <FileName>drv_leds.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\drv_leds.h</FilePath>
-            </File>
-            <File>
-              <FileName>drv_tiempo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\drv_tiempo.c</FilePath>
-            </File>
-            <File>
-              <FileName>drv_tiempo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\drv_tiempo.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\hal_gpio.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_tiempo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\hal_tiempo.h</FilePath>
+              <FilePath>..\..\src\rt_fifo.c</FilePath>
             </File>
             <File>
               <FileName>board.h</FileName>
@@ -462,49 +437,24 @@
               <FilePath>..\..\src\board.h</FilePath>
             </File>
             <File>
-              <FileName>drv_consumo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\drv_consumo.c</FilePath>
-            </File>
-            <File>
-              <FileName>drv_consumo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\drv_consumo.h</FilePath>
-            </File>
-            <File>
-              <FileName>hal_consumo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\hal_consumo.h</FilePath>
-            </File>
-            <File>
-              <FileName>drv_monitor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\drv_monitor.h</FilePath>
-            </File>
-            <File>
-              <FileName>drv_monitor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\drv_monitor.c</FilePath>
-            </File>
-            <File>
-              <FileName>rt_fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\rt_fifo.c</FilePath>
-            </File>
-            <File>
               <FileName>rt_fifo.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\src\rt_fifo.h</FilePath>
             </File>
             <File>
-              <FileName>rt_evento_t.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\rt_evento_t.h</FilePath>
-            </File>
-            <File>
               <FileName>mod_tests.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\mod_tests.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt_GE.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\rt_GE.h</FilePath>
+            </File>
+            <File>
+              <FileName>rt_GE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\rt_GE.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -536,6 +486,11 @@
               <FileType>1</FileType>
               <FilePath>..\src_lpc\hal_consumo_lpc.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_ext_int_lpc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src_lpc\hal_ext_int_lpc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -545,6 +500,106 @@
               <FileName>Startup.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\src_lpc\Startup.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>drv_consumo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_consumo.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_consumo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_consumo.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_leds.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_leds.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_leds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_leds.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_monitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_monitor.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_monitor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_monitor.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_tiempo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_tiempo.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_tiempo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_tiempo.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Services</GroupName>
+          <Files>
+            <File>
+              <FileName>svc_alarma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\svc_\svc_alarma.h</FilePath>
+            </File>
+            <File>
+              <FileName>svc_alarma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\svc_\svc_alarma.c</FilePath>
+            </File>
+            <File>
+              <FileName>svc_diagnostico.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\svc_\svc_diagnostico.c</FilePath>
+            </File>
+            <File>
+              <FileName>svc_diagnostico.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\svc_\svc_diagnostico.h</FilePath>
+            </File>
+            <File>
+              <FileName>svc_GE.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\svc_\svc_GE.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Hal_H</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_consumo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_consumo.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_tiempo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_tiempo.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_ext_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_ext_int.h</FilePath>
             </File>
           </Files>
         </Group>

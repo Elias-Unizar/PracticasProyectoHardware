@@ -9,7 +9,7 @@ err_t ERROR_MONITOR_INVALIDO = -2;
 
 static uint32_t total_monitores = 0;
 static MONITOR_id_t canalError;
-uint8_t monitorDisponible[MAX_MONITORES];
+uint8_t monitorOcupado[MAX_MONITORES];
 
 err_t svc_DIAGNOSTICO_iniciar(){
 	total_monitores = drv_monitor_iniciar();
@@ -17,22 +17,22 @@ err_t svc_DIAGNOSTICO_iniciar(){
 		return ERROR_0_MONITORES;
 	}
 	for (uint8_t i = 0; i < total_monitores; i++){
-		monitorDisponible[i] = 1;
+		monitorOcupado[i] = 0;
 	}
 	canalError = 0;
-	monitorDisponible[canalError] = 0;//Canal de error
+	monitorOcupado[canalError] = 1;//Canal de error
 	return 0;
 }
  
 CANAL_T svc_DIAGNOSTICO_reservar(){
 	if(total_monitores > 0){
-		uint32_t monitorLibre = 1;
-		while(monitorLibre < total_monitores && monitorDisponible[monitorLibre] == 0){
-			monitorLibre++;
-		}//Cuando sale del bucle, monitorLibre es la posicion del vector que corresponde con un monitor sin asignar
-		if (monitorLibre < total_monitores){//Ha conseguido un monitor
-			monitorDisponible[monitorLibre] = 0;
-			return (CANAL_T)monitorLibre;
+		uint32_t monitor = 1;
+		while(monitor < total_monitores && monitorOcupado[monitor] != 0){
+			monitor++;
+		}//Cuando sale del bucle, monitor es la posicion del vector que corresponde con un monitor sin asignar
+		if (monitor < total_monitores){//Ha conseguido un monitor
+			monitorOcupado[monitor] = 1;
+			return (CANAL_T)monitor;
 		}
 	}
 	return 0;//O sin canales, o sin iniciar
@@ -43,7 +43,7 @@ err_t svc_DIAGNOSTICO_desreservar(CANAL_T canal){
 	if(err != 0){
 		return err;
 	}
-	monitorDisponible[canal] = 1;
+	monitorOcupado[canal] = 0;
 	return 0;
 }
  

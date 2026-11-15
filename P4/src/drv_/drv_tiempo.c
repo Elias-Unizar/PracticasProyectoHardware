@@ -13,15 +13,6 @@ static hal_tiempo_info_t infoReloj = {0, 0, 0};
 
 static hal_tiempo_info_t infoRelojPer = {0, 0, 0};
 
-
-#ifdef TEST_TIEMPO
-#include "hal_tiempo.h"
-void drv_tiempo_info_relojes(hal_tiempo_info_t *out_info_mon, hal_tiempo_info_t *out_info_per){
-	out_info_mon = &infoReloj;
-	out_info_per ) &infoRelojPer;
-}
-
-#endif
 /*
     uint32_t ticks_per_us;    ticks de HW por microsegundo (p.ej., 15 a 15 MHz) 
     uint8_t  counter_bits;    ancho del contador libre (p.ej., 32) 
@@ -31,10 +22,19 @@ void drv_tiempo_info_relojes(hal_tiempo_info_t *out_info_mon, hal_tiempo_info_t 
 /**
  * inicializa el reloj y empieza a contar
  */
+
+static uint8_t iniciado = 0;
+
 bool drv_tiempo_iniciar(){
+	if(iniciado != 0){return true;}
 	hal_tiempo_iniciar_tick(&infoReloj);
 	hal_tiempo_iniciar_tick_periodico(&infoRelojPer);
-	return infoReloj.ticks_per_us != 0 && infoRelojPer.ticks_per_us != 0;
+	if(infoReloj.ticks_per_us != 0 && infoRelojPer.ticks_per_us != 0){
+		iniciado = 1;
+		return true;
+	}else{
+		return false;
+	}
 }
 
 /**
@@ -85,4 +85,8 @@ void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_app)(), uin
 	drv_tiempo_registrar_callback(funcion_callback_app, ID_evento);
 	
 	hal_tiempo_reloj_periodico_tick(tiempoTickExtra, funcion_callback_drv);
+}
+
+void drv_tiempo_parar_periodico(){
+	hal_tiempo_periodico_enable(false);
 }

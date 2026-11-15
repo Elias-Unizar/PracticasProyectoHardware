@@ -1,29 +1,30 @@
-
 #include "drv_consumo.h"
 #include "hal_consumo.h"
-#include "drv_monitor.h"
 
-static Monitor_id_t int_monitorConsumoEsperar;
-static Monitor_id_t int_monitorConsumoDormir;
+static CANAL_T canalConsumo;
 
-void drv_consumo_iniciar(Monitor_id_t monitorConsumoEsperar, Monitor_id_t monitorConsumoDormir){
+uint8_t iniciado = 0;
+
+err_t drv_consumo_iniciar(){
+	if(iniciado != 0){return ERROR_SINERROR;}
+	svc_DIAGNOSTICO_iniciar();
 	hal_consumo_iniciar();
-	int_monitorConsumoEsperar = monitorConsumoEsperar;
-	int_monitorConsumoDormir = monitorConsumoDormir;
-	drv_monitor_marcar(int_monitorConsumoEsperar);
-	drv_monitor_marcar(int_monitorConsumoDormir);
+	canalConsumo = svc_DIAGNOSTICO_reservar();
+	svc_DIAGNOSTICO_senyalar(canalConsumo);
+	iniciado = 1;
+	return ERROR_SINERROR;
 }
 
 
 void drv_consumo_esperar(){
-	drv_monitor_desmarcar(int_monitorConsumoEsperar);
+	svc_DIAGNOSTICO_limpiar(canalConsumo);
 	hal_consumo_esperar();
-	drv_monitor_marcar(int_monitorConsumoEsperar);
+	svc_DIAGNOSTICO_senyalar(canalConsumo);
 }
 
 
 void drv_consumo_dormir(){
-	drv_monitor_desmarcar(int_monitorConsumoDormir);
+	svc_DIAGNOSTICO_limpiar(canalConsumo);
 	hal_consumo_dormir();
-	drv_monitor_marcar(int_monitorConsumoDormir);
+	svc_DIAGNOSTICO_senyalar(canalConsumo);
 }

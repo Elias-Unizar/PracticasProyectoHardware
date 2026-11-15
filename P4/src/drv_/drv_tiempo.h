@@ -16,12 +16,6 @@ typedef uint32_t Tiempo_ms_t;
 /* Arranca el reloj; devuelve true si ok */
 bool drv_tiempo_iniciar(void);
 
-#ifdef TEST_TIEMPO
-#include "hal_tiempo.h"
-void drv_tiempo_info_relojes(hal_tiempo_info_t *out_info_mon, hal_tiempo_info_t *out_info_per);
-
-#endif
-
 /* Tiempo desde inicio en micro/mili segundos */
 Tiempo_us_t drv_tiempo_actual_us(void);
 Tiempo_ms_t drv_tiempo_actual_ms(void);
@@ -33,4 +27,6 @@ void drv_tiempo_esperar_ms(Tiempo_ms_t ms);
 Tiempo_ms_t drv_tiempo_esperar_hasta_ms(Tiempo_ms_t deadline_ms);
 
 void drv_tiempo_periodico_ms(Tiempo_ms_t ms, void (*funcion_callback_app)(), uint32_t ID_evento);
+
+void drv_tiempo_parar_periodico(void);
 #endif // DRV_TIEMPO_H

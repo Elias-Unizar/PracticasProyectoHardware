@@ -10,7 +10,7 @@ typedef struct{
 	Tiempo_us_t TS;
 }EVENTO;
 
-void rt_FIFO_inicializar(uint32_t monitor_overflow);
+err_t rt_FIFO_inicializar(void);
 
 void rt_FIFO_encolar(EVENTO_T ID_evento, uint32_t auxData);
 

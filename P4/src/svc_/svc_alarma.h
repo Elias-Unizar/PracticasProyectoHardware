@@ -6,7 +6,9 @@
 #include "drv_tiempo.h"
 #include "svc_GE.h"
 
-err_t svc_alarma_iniciar(void (*cb_a_llamar)());
+#define ERROR_ALARMA_DESBORDE_ALARMA (-1);
+
+err_t svc_alarma_iniciar(CALLBACK_T cb_a_llamar);
 
 uint32_t svc_alarma_codificar(bool periodico, Tiempo_ms_t retardo_ms, uint8_t flags);
 

@@ -13,11 +13,13 @@
  * de poder llamar al resto de funciones de la biblioteca.
  * re-configura todos los pines como de entrada (para evitar cortocircuitos)
  */
- 
+static uint8_t iniciado = 0;
 void hal_gpio_iniciar(void){
-  // Reiniciamos los pines todos como entrada (igual al reset):
-  IODIR = 0x0; // GPIO Port Direction control register.
-				       // Controla la dirección de cada puerto pin
+	if(iniciado == 0){
+		// Reiniciamos los pines todos como entrada (igual al reset):
+		IODIR = 0x0; // GPIO Port Direction control register. Controla la dirección de cada puerto pin
+		iniciado = 1;
+	}
 }
 
 /* *****************************************************************************

@@ -4,16 +4,20 @@
 #include <stddef.h>
 #include "svc_diagnostico.h"
 
-#define EVENT_TYPES 8
+#define EVENT_TYPES 8 //Sin el ev_VOID
+
+typedef void (*CALLBACK_T)();
 typedef uint32_t EVENTO_T;
-EVENTO_T ev_VOID = 0;
 
-void svc_GE_iniciar();
+#define ev_VOID 0
 
-EVENTO_T svc_GE_reservar_ID();
 
-err_t svc_GE_suscribir(EVENTO_T ID_evento, uint8_t prioridad , void (*f_callback)());
+err_t svc_GE_iniciar(void);
 
-err_t svc_GE_cancelar(EVENTO_T ID_evento, void (*f_callback)());
+EVENTO_T svc_GE_reservar_ID(void);
+
+err_t svc_GE_suscribir(EVENTO_T ID_evento, uint8_t prioridad , CALLBACK_T f_callback);
+
+err_t svc_GE_cancelar(EVENTO_T ID_evento, CALLBACK_T f_callback);
 
 #endif

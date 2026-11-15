@@ -17,11 +17,11 @@
  * Autores: Enrique Torrs
  * Universidad de Zaragoza
  * ****************************************************************************/
+#include "env.h"
+#ifndef ACTIVAR_TEST
+
 #define VERSION_BLINK_EJECUTAR 4
 
-
-#define TEST 1
-//0 no, 1 si
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -35,8 +35,7 @@
 /* Constante de retardo en milisegundos */
 #define RETARDO_MS 500u 		 /* ejemplo: medio segundo */
 
-#if TEST == 0
-	
+
 #if VERSION_BLINK_EJECUTAR == 1
 /* *****************************************************************************
  * BLINK v1: parpadeo de un LED conmutando on/off.

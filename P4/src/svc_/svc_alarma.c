@@ -1,8 +1,6 @@
 #include "svc_alarma.h"
-#include "svc_GE.h"
 
 #define svc_ALARMAS_MAX 4
-err_t ERROR_ALARMA_DESBORDE_ALARMA;
 
 typedef struct{
 	bool activa;
@@ -68,13 +66,23 @@ void actualizarTimers(Tiempo_ms_t tiempoTranscurrido){
 }
 
 //-------FUNCIONES EXTERNAS---------//
-err_t svc_alarma_iniciar(void (*cb_a_llamar)()){
+
+static uint8_t iniciado = 0;
+
+err_t svc_alarma_iniciar(CALLBACK_T cb_a_llamar){
+	if(iniciado != 0){return ERROR_SINERROR;}
+	svc_GE_iniciar();
+	drv_tiempo_iniciar();
+	svc_DIAGNOSTICO_iniciar();
+	
 	ev_A_PERIODICA = svc_GE_reservar_ID();
 	svc_GE_suscribir(ev_A_PERIODICA, 0, svc_alarma_actualizar);
 	periodo_timer_periodico = 0x00FFFFFF;//Si no hay alarmas, que no moleste mucho a ser posible
 	f_cb = cb_a_llamar;
 	drv_tiempo_periodico_ms(periodo_timer_periodico, f_cb, ev_A_PERIODICA);
 	ultimaActualizacion = drv_tiempo_actual_ms();
+	iniciado = 1;
+	return ERROR_SINERROR;
 }
 
 uint32_t svc_alarma_codificar(bool periodico, Tiempo_ms_t retardo_ms, uint8_t flags){
@@ -96,20 +104,21 @@ err_t svc_alarma_activar(uint32_t alarma_flags, EVENTO_T ID_evento, uint32_t aux
 			break;
 		}
 	}
-	//Aqui, o i es mayor a ALARMAS_MAX, o es la posicion de una alarma libre
-	if(alarma_encontrada != -1){//reprogramar
-		programarAlarma(alarma_encontrada, alarma_flags, ID_evento, auxData);
-	}else if(hueco_alarma != -1){//crear nueva, pero hay hueco
-		programarAlarma(hueco_alarma, alarma_flags, ID_evento, auxData);		
-	}else{//No hay hueco, ni se reprograma
+	if(alarma_encontrada == -1 && hueco_alarma == -1){
 		return ERROR_ALARMA_DESBORDE_ALARMA;
 	}
 	Tiempo_ms_t actAnt = ultimaActualizacion;
 	ultimaActualizacion = drv_tiempo_actual_ms();
 	actualizarTimers(ultimaActualizacion - actAnt);
+	//Aqui, o i es mayor a ALARMAS_MAX, o es la posicion de una alarma libre
+	if(alarma_encontrada != -1){//reprogramar
+		programarAlarma(alarma_encontrada, alarma_flags, ID_evento, auxData);
+	}else if(hueco_alarma != -1){//crear nueva, pero hay hueco
+		programarAlarma(hueco_alarma, alarma_flags, ID_evento, auxData);		
+	}
 	periodo_timer_periodico = recalcularTimerPeriodico();
 	drv_tiempo_periodico_ms(periodo_timer_periodico, f_cb, ev_A_PERIODICA);
-	return 0;
+	return ERROR_SINERROR;
 }
 
 void svc_alarma_actualizar(EVENTO_T evento, uint32_t aux){
@@ -126,6 +135,7 @@ void svc_alarma_actualizar(EVENTO_T evento, uint32_t aux){
 			}
 		}
 		periodo_timer_periodico = recalcularTimerPeriodico();
+		ultimaActualizacion = drv_tiempo_actual_ms();
 		drv_tiempo_periodico_ms(periodo_timer_periodico, f_cb, ev_A_PERIODICA);
 	}
 }

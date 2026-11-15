@@ -59,15 +59,18 @@ static inline LED_status_t status_from_hw_level(uint32_t level) {
 
 /* API ---------------------------------------------------------------------- */
 
+static uint8_t iniciado = 0;
+
 unsigned int drv_leds_iniciar(){
 	#if LEDS_NUMBER > 0
+	if(iniciado != 0){return (unsigned int)LEDS_NUMBER;}
     for (LED_id_t i = 1; i <= (LED_id_t)LEDS_NUMBER; ++i) {
         hal_gpio_sentido(s_led_list[i-1], HAL_GPIO_PIN_DIR_OUTPUT);
         /* Apagar por defecto respetando activo-alto/bajo */
         hal_gpio_escribir(s_led_list[i-1], hw_level_from_status(LED_OFF));
     }
   #endif //LEDS_NUMBER > 0	
-	
+	iniciado = 1;
 	return (unsigned int)LEDS_NUMBER;  //definido en board_xxx.h en cada placa... 
 }
 

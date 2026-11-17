@@ -26,4 +26,9 @@ void hal_ext_int_deshabilitar(uint32_t pin);
  */
 void hal_ext_int_habilitar(uint32_t pin);
 
+void hal_ext_int_habilitar_despertar(uint32_t pin);
+
+void hal_ext_int_deshabilitar_despertar(uint32_t pin);
+
+
 #endif // HAL_EXT_INT_H

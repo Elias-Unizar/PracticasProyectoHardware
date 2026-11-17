@@ -541,6 +541,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\drv_\board.h</FilePath>
             </File>
+            <File>
+              <FileName>drv_botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_botones.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_botones.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -83,8 +83,8 @@ void T0_ISR(void) __irq {
 void hal_tiempo_iniciar_tick_periodico(hal_tiempo_info_t *out_info_per) {
     //Config sin arrancar tampoco
 		T0TCR = 0;
-    VICVectAddr0 = (unsigned long)T0_ISR;
-    VICVectCntl0 = 0x20 | 4;  /* fuente 4 = Timer0 */
+    VICVectAddr3 = (unsigned long)T0_ISR;
+    VICVectCntl3 = 0x20 | 4;  /* fuente 4 = Timer0 */
 		//La precision de nuestra aplicacion está en los microsegundos, por tanto contar 1 tick / microseg no sería mala idea pero...
 		//Como el reloj se reinicia de cero cada vez que lo queremos activar, podriamos hacer parafernalias
 		int32_t prescaler = 14;
@@ -109,7 +109,8 @@ static void hal_tiempo_periodico_set_callback(void (*cb)()) {
 void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
         VICIntEnable |= (1u << 4); //Permite que la fuente 4 sea una "interrupción válida"
-        T0TCR = 2; T0TCR = 1; //Resetea contador y lo inicia
+        T0TCR = 2; 
+				T0TCR = 1; //Resetea contador y lo inicia
     } else {
         T0TCR = 0; //Para contador
         VICIntEnClr = (1u << 4); //Quita la interrupcion 4 como una válida

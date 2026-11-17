@@ -87,7 +87,7 @@ err_t svc_alarma_iniciar(CALLBACK_T cb_a_llamar){
 
 uint32_t svc_alarma_codificar(bool periodico, Tiempo_ms_t retardo_ms, uint8_t flags){
 	uint32_t flag_final = (periodico == true) ? 0x80000000 : 0x00000000;
-	flag_final |= (flags << 24);
+	flag_final |= ((0x7F & flags) << 24);
 	flag_final |= retardo_ms;
 	return flag_final;
 }

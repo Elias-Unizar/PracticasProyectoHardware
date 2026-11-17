@@ -124,7 +124,7 @@ static uint8_t test_svc_alarma_reprogramar(void){
 	drv_tiempo_esperar_ms(2);
 	svc_alarma_activar(svc_alarma_codificar(false, 20, 0), 5, 9);    /* mismo ID: sustituye */
 	nCb = 0;
-	drv_tiempo_esperar_ms(20 + TOL_MS);
+	drv_tiempo_esperar_ms(20 + TOL_MS);	///JAJAJAJAJAJ mierda LPC y sus muertos, no al hacer un segundo timer, Timer0 no resetea su TC, y por tanto nada funciona
 	if (nCb == 0) return 0;
 	svc_alarma_actualizar(ultimoEv, ultimoAux);
 	if (ultimoEv != 5 || ultimoAux != 9) return 0;                   /* salta la nueva, con su aux */

@@ -31,7 +31,7 @@
 
 #define BUTTON_PULL    1 //poner pullup interno a los botones
 
-#define BUTTONS_ACTIVE_STATE 1
+#define BUTTONS_ACTIVE_STATE 0
 
 #define BUTTONS_LIST { BUTTON_1, BUTTON_2, BUTTON_3 }
 

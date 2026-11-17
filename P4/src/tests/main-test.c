@@ -27,6 +27,9 @@
 #ifdef TEST_SVC_ALARMA
 #include "test_svc_alarma.h"
 #endif
+#ifdef TEST_BOTONES
+#include "test_svc_alarma.h"
+#endif
 /* Un bit por modulo; 0 = todo bien. Se puede mirar en el debugger. */
 
 volatile uint32_t tests_fallos = 0;
@@ -72,6 +75,10 @@ int main(void){
 	while(tests_fallos != 0){;}
 #endif
 
+#ifdef TEST_BOTONES
+	if (!test_svc_alarma_todos()) tests_fallos = 1;
+	while(tests_fallos != 0){;}
+#endif
 
 	/* En sistemas empotrados no se retorna */
 	while (1) { /* idle */ }

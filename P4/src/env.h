@@ -16,6 +16,6 @@
 //#define TEST_RT_FIFO 
 //#define TEST_SVC_DIAGNOSTICO
 //#define TEST_SVC_GE
-//#define TEST_SVC_ALARMA
-//#define TEST_BOTONES
+#define TEST_SVC_ALARMA
+#define TEST_BOTONES
 #endif

@@ -1,3 +1,4 @@
+#if 0
 #ifndef BOARD_NRF
 #define BOARD_NRF
 
@@ -38,4 +39,5 @@
 #define BUTTONS_LIST { BUTTON_1 }
 #endif //botonos
 
+#endif
 #endif

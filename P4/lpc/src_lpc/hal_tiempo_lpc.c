@@ -110,6 +110,9 @@ void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
         VICIntEnable |= (1u << 4); //Permite que la fuente 4 sea una "interrupción válida"
         T0TCR = 2; 
+				T0TC = 0;//FORZZZZZZZAMOS
+				uint32_t dummmmmmmmmmmmmmmmmmmmmmmmmmmmy = 0;
+				dummmmmmmmmmmmmmmmmmmmmmmmmmmmy += 1;//POR ALGUN MOTIVO NO RESETEA BIEN EL TC AL ESTAR T0TCR = 2 Y = 1 TAN JUNTOS
 				T0TCR = 1; //Resetea contador y lo inicia
     } else {
         T0TCR = 0; //Para contador

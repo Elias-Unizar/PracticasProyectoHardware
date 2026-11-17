@@ -4,157 +4,132 @@
  */
 
 #include <nrf.h>
-#include "hal_tiempo.h"
+#include "hal_ext_int.h"
+//Asocia canales GPIO(posiciones del vector) a los pines que contiene el vector
+static uint32_t canalGPIOTE_pin[8];
 
-#include <stdbool.h>  // si usas bool/true/false
-#include <stddef.h>   // define NULL
+static void (*funcion_ISR)(uint32_t) = 0;
+//ISR del GPIOTE
+void GPIOTE_IRQHandler(void) {
+    uint32_t i;
+    //Si estabamos dormidos, nos podemos haber despertado por esto, limpiamos interrupcion
+    NRF_GPIOTE->EVENTS_PORT = 0u;  
 
-#define PCLK_MHZ          16u
-#define TICKS_PER_US      PCLK_MHZ
-#define COUNTER_BITS      32u
-#define COUNTER_MAX       (0xFFFFFFFFu)
-
-/*
-static volatile uint64_t s_of;
-void SysTick_Handler(void){
-    s_of++;
-}
-
-ver placa DK para tick/micro
-out_info->counter_bits = 24;
-out_info->counter_max  = (1 << 24) - 1;
-
-			SysTick->LOAD = counter_max;
-			SysTick->VAL  = 1; escribir lo que sea borra el valor que habia
-*/
-
-
-
-/* ---- Tick libre con T1 --------------------------------------------------- */
-static volatile uint32_t s_overflows_t0 = 0;  /* cuenta desbordes de T1 */
-
-void TIMER0_IRQHandler(void) __irq {
-		volatile uint32_t dummy;  
-		/* CC0 al máximo para provocar overflow controlado */
-		if (NRF_TIMER0->EVENTS_COMPARE[0] == 1){
-			NRF_TIMER0->EVENTS_COMPARE[0] = 0;                  /* clear CC0 int */
-			s_overflows_t0++;
-			dummy = NRF_TIMER0->EVENTS_COMPARE[0];
-			dummy;
-
+    for (i = 0; i < 8; i++) {
+			if (NRF_GPIOTE->EVENTS_IN[i] != 0u) {
+				NRF_GPIOTE->EVENTS_IN[i] = 0u;
+				//se rellena EVENT aunque no esten activas SUS interrupciones, y por tatno no queremos que se activen
+				if ((NRF_GPIOTE->INTENSET & (1u << i)) != 0u){
+					funcion_ISR(canalGPIOTE_pin[i]);
+					break;//Prefiero hacer un boton por ISR, no varios a la vez
+				}
+			}
 		}
 }
 
-/* *****************************************************************************
- * Programa un contador de tick sobre Timer1, con maxima precisión y minimas interrupciones
+/**
+ * @brief Inicializa GPIOTE y habilita su interrupcion en el NVIC.
  */
-void hal_tiempo_iniciar_tick(hal_tiempo_info_t *out_info) {
-		//Si se quiere cambiar a que sea de 32 bits, con otra frecuencia etc... hacerlo antes de recabar la informacion del clock
-		NRF_TIMER0->BITMODE = TIMER_BITMODE_BITMODE_32Bit << TIMER_BITMODE_BITMODE_Pos;
-		out_info->counter_bits = COUNTER_BITS;
-    out_info->counter_max  = COUNTER_MAX;
-		NRF_TIMER0->PRESCALER  = 0 << TIMER_PRESCALER_PRESCALER_Pos; //fclock = 16MHz / 2^Prescaler ---> 16Mhz / 16
-		out_info->ticks_per_us = TICKS_PER_US;
-	
-		s_overflows_t0 = 0;
-    /* Timer1 como free-running: cuenta hasta MAX y se “resetea” por match */
-		NRF_TIMER0->CC[0] = COUNTER_MAX;
-
-	  NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
-
-		// Clear the timer when COMPARE0 event is triggered
-		NRF_TIMER0->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
-
-		NVIC_EnableIRQ(TIMER0_IRQn);
-		NRF_TIMER0->TASKS_START = 1;
+static uint8_t  iniciado = 0;
+void hal_ext_int_iniciar(void (*f_callback_isr)(uint32_t pin)) {
+	if (iniciado == 0) {
+		iniciado = 1;
+		funcion_ISR = f_callback_isr;
+		
+		NRF_GPIOTE->INTENCLR = 0xFFFFFFFFu;//Dehabilitamos toda interrupcion	
+		for(uint8_t i = 0; i < 8; i++) {
+			NRF_GPIOTE->EVENTS_IN[i] = 0u;
+			canalGPIOTE_pin[i] = 0xFFFFFFFF;
+		}		
+		
+		NVIC_EnableIRQ(GPIOTE_IRQn);
+	}
 }
 
-/* Lectura 64-bit sin carrera: lee TC, luego overflows, re-lee TC si hizo wrap */
-uint64_t hal_tiempo_actual_tick64(void) {
-    uint32_t hi1, hi2, lo2;
-
-    hi1 = s_overflows_t0;
-		NRF_TIMER0->TASKS_CAPTURE[2] = 1;
-    hi2 = s_overflows_t0;
-    
-		if (hi2 != hi1) {
-        /* ocurrió wrap entre lecturas: usar hi actualizado */
-				NRF_TIMER0->TASKS_CAPTURE[2] = 1;
-			  lo2 = NRF_TIMER0->CC[2];
-        return (((uint64_t)hi2) * ((uint64_t)COUNTER_MAX + 1u)) + lo2;
-    }
-		lo2 = NRF_TIMER0->CC[2];
-    return (((uint64_t)hi1) * ((uint64_t)COUNTER_MAX + 1u)) + lo2;
+uint32_t obtenerCanalGPIOTE(uint32_t pin){
+	uint32_t canalEncontrado = 9;
+	uint32_t canalLibre = 9;
+	for(uint32_t i = 0; i < 8; i++){
+		if(canalGPIOTE_pin[i] == pin){
+			canalEncontrado = i;
+		}
+		if(canalGPIOTE_pin[i] == 0xFFFFFFFF){
+			canalLibre = i;
+		}
+	}
+	return (canalEncontrado == 9) ? canalLibre : canalEncontrado;
 }
 
-/* ***************************************************************************** */
+/**
+ * @brief Configura un pin como entrada con interrupcion por flanco. COMIENZA DESHABILITADA.
+ * NRF_GPIO_PIN_MAP(port, pin) (((port) << 5) | ((pin) & 0x1F)) 
+*/
+void hal_ext_int_config_pin(uint32_t pin) {
+    uint32_t canalGpiote = obtenerCanalGPIOTE(pin); /* reutiliza canal si ya estaba, si no devuelve el primer libre, si esta lleno devuelve 9 */
+    if (canalGpiote == 9) return;
+		
+    NRF_GPIOTE->INTENCLR = (1u << canalGpiote);//empiezan deshabilitadas
+    canalGPIOTE_pin[canalGpiote] = pin;
 
-/* ---- Reloj periódico con T0 ---------------------------------------------- */
-static void (*s_cb)() = 0;		//puntero a funcion a llamar cuando salte la RSI (en modo irq)
+		if((pin & 0x20) == 0){//puerto 0, puerto 1 usaria NRF_P1, de momento no se usa nunca asi que no lo implemento
+			NRF_GPIO->PIN_CNF[pin & 0x1F] = (GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos)
+																		|(GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos)
+																		|(GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos)
+																		|(GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos)
+																		|(GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
+			
+			NRF_GPIOTE->CONFIG[canalGpiote] = (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos)
+																			|((pin & 0x1F) << GPIOTE_CONFIG_PSEL_Pos)
+																			|(((pin & 0x20) >> 5) << GPIOTE_CONFIG_PORT_Pos)
+																			|(GPIOTE_CONFIG_POLARITY_HiToLo << GPIOTE_CONFIG_POLARITY_Pos);
 
-/* *****************************************************************************
- * Timer Interrupt Service Routine
- * llama a la funcion de callbak que se ejecutara en modo irq
+			NRF_GPIOTE->EVENTS_IN[canalGpiote] = 0u;//Descartar eventos pasados
+		}
+}
+
+/**
+ * @brief Deshabilita la interrupcion de un pin.
  */
-
-void TIMER1_IRQHandler(void) __irq {
-		volatile uint32_t dummy;  
-    if (NRF_TIMER1->EVENTS_COMPARE[0]) {
-									// Llamo a la función desde la RSI. Gracias a esto suponemos que pasan los 3? 5? ciclos que se exigen del timer
-			NRF_TIMER1->EVENTS_COMPARE[0] = 0;
-			dummy = NRF_TIMER1->EVENTS_COMPARE[0];
-			dummy;
-			if (s_cb) s_cb();
-		}// Clear interrupt flag
-}
-
-void hal_tiempo_iniciar_tick_periodico(hal_tiempo_info_t *out_info_per){
-	  NRF_TIMER1->TASKS_STOP = 1;
-		NRF_TIMER1->BITMODE = TIMER_BITMODE_BITMODE_32Bit;
-		NRF_TIMER1->PRESCALER = 4 << TIMER_PRESCALER_PRESCALER_Pos;
+void hal_ext_int_deshabilitar(uint32_t pin) {
+    int canal = obtenerCanalGPIOTE(pin);
+    if (canal == 9 || canalGPIOTE_pin[canal] != pin) return;//o lleno o libre, pero no es el propio pin
 	
-		out_info_per->counter_bits = 32;
-		out_info_per->counter_max = 0xFFFFFFFF;
-		out_info_per->ticks_per_us = 1;
+    NRF_GPIOTE->INTENCLR = (1u << canal);
+    NRF_GPIOTE->EVENTS_IN[canal] = 0u;
 }
 
-static void hal_tiempo_periodico_config_tick(uint32_t periodo_en_tick) {
-    /* Config sin arrancar */
-    NRF_TIMER1->TASKS_STOP = 1;
-    NRF_TIMER1->CC[0] = periodo_en_tick - 1u;
-		NRF_TIMER1->INTENSET = TIMER_INTENSET_COMPARE0_Enabled << TIMER_INTENSET_COMPARE0_Pos;
-		NRF_TIMER1->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Enabled << TIMER_SHORTS_COMPARE0_CLEAR_Pos;
+/**
+ * @brief Habilita la interrupcion de un pin.
+ */
+void hal_ext_int_habilitar(uint32_t pin) {
+    int canal = obtenerCanalGPIOTE(pin);
+    if (canal == 9 || canalGPIOTE_pin[canal] != pin) return;//o lleno o libre, pero no es el propio pin
+
+    NRF_GPIOTE->EVENTS_IN[canal] = 0u;
+    NRF_GPIOTE->INTENSET = (1u << canal);
 }
 
-static void hal_tiempo_periodico_set_callback(void (*cb)()) {
-    s_cb = cb;
+void hal_ext_int_habilitar_despertar(uint32_t pin) {
+    uint32_t canal = obtenerCanalGPIOTE(pin);
+    if (canal == 9 || canalGPIOTE_pin[canal] != pin) return;
+		
+		if((pin & 0x20) == 0){//puerto 0, puerto 1 usaria NRF_P1, de momento no se usa nunca asi que no lo implemento
+
+			NRF_GPIOTE->INTENCLR = GPIOTE_INTENCLR_PORT_Msk;//Deshabilitamos port, luego configuramos sources, luego borramos INT pasadas, reactivamos INT
+
+			uint32_t confAct = NRF_GPIO->PIN_CNF[pin & 0x1F];
+			NRF_GPIO->PIN_CNF[pin & 0x1F] = confAct | (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
+
+			NRF_GPIOTE->EVENTS_PORT = 0u;
+			NRF_GPIOTE->INTENSET = GPIOTE_INTENSET_PORT_Msk;
+		}
 }
 
-void hal_tiempo_periodico_enable(bool enable) {
-    if (enable) {
-        NVIC_EnableIRQ(TIMER1_IRQn);
-        NRF_TIMER1->TASKS_START = 1;
-    } else {
-        NRF_TIMER1->TASKS_STOP = 1;
-        NVIC_DisableIRQ(TIMER1_IRQn);
-    }
+void hal_ext_int_deshabilitar_despertar(uint32_t pin) {
+  uint32_t canal = obtenerCanalGPIOTE(pin);
+  if (canal == 9 || canalGPIOTE_pin[canal] != pin) return;	
+	if((pin & 0x20) == 0){//puerto 0, puerto 1 usaria NRF_P1, de momento no se usa nunca asi que no lo implemento
+    NRF_GPIO->PIN_CNF[pin & 0x1F] &= ~(GPIO_PIN_CNF_SENSE_Msk);//La Msk ya son los propios bits de posicion del sense a 1, 
+		//negarlos los pone todos a 0, y el resto de bits que estaban todos a 0, a 1, asi que no borra configuracion previa
+	}
 }
-
-void hal_tiempo_reloj_periodico_tick(uint32_t periodo_en_tick, void (*funcion_callback_drv)(void)){
-    /* 1) Deshabilitar antes de tocar config/callback (evita ISR en mitad de cambios) */
-    hal_tiempo_periodico_enable(false);
-
-    /* 2) Registrar callback (puede ser NULL si vamos a deshabilitar) */
-    hal_tiempo_periodico_set_callback(funcion_callback_drv);
-
-    /* 3) Configurar periodo (no arranca el temporizador) */
-    hal_tiempo_periodico_config_tick(periodo_en_tick);
-
-    /* 4) Habilitar si hay periodo válido y callback no nulo; deshabilitar en caso contrario */
-    if (periodo_en_tick != 0u && funcion_callback_drv != NULL) {
-        hal_tiempo_periodico_enable(true);
-    } else {
-        hal_tiempo_periodico_enable(false);
-    }
-}
-

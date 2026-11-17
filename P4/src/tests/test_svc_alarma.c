@@ -73,8 +73,7 @@ static uint8_t test_svc_alarma_activar(void){
 static uint8_t test_svc_alarma_actualizar(void){
 	nCb = 0;
 	svc_alarma_activar(svc_alarma_codificar(false, 20, 0), 3, 7);   /* evento 3, aux 7, a los 20 ms */
-	Tiempo_ms_t t0 = drv_tiempo_actual_ms();
-	while (drv_tiempo_actual_ms() - t0 < 30) {;}
+	drv_tiempo_esperar_ms(25);
 	if (nCb == 0) return 0;                               /* el timer no ha avisado */
 	svc_alarma_actualizar(ultimoEv, ultimoAux);           /* lo que haria el GE al sacarlo de la FIFO */
 	return (ultimoEv == 3) && (ultimoAux == 7);
@@ -112,7 +111,7 @@ static uint8_t test_svc_alarma_periodica(void){
 		svc_alarma_actualizar(ultimoEv, ultimoAux);                  /* lo que haria el GE */
 		if (ultimoEv != 5 || ultimoAux != 3) return 0;
 	}
-	activar(5, 0);                                                   /* cancelar */
+	svc_alarma_activar(svc_alarma_codificar(false, 0, 0), 5, 3);     /* cancelar: mismo ID y aux */
 	nCb = 0;
 	drv_tiempo_esperar_ms(20 + TOL_MS);
 	return nCb == 0;                                                 /* ya no salta */
@@ -122,12 +121,12 @@ static uint8_t test_svc_alarma_periodica(void){
 static uint8_t test_svc_alarma_reprogramar(void){
 	svc_alarma_activar(svc_alarma_codificar(false, 200, 0), 5, 1);
 	drv_tiempo_esperar_ms(2);
-	svc_alarma_activar(svc_alarma_codificar(false, 20, 0), 5, 9);    /* mismo ID: sustituye */
+	svc_alarma_activar(svc_alarma_codificar(false, 20, 0), 5, 1);    /* mismo ID: sustituye */
 	nCb = 0;
 	drv_tiempo_esperar_ms(20 + TOL_MS);	///JAJAJAJAJAJ mierda LPC y sus muertos, no al hacer un segundo timer, Timer0 no resetea su TC, y por tanto nada funciona
 	if (nCb == 0) return 0;
 	svc_alarma_actualizar(ultimoEv, ultimoAux);
-	if (ultimoEv != 5 || ultimoAux != 9) return 0;                   /* salta la nueva, con su aux */
+	if (ultimoEv != 5 || ultimoAux != 1) return 0;                   /* salta la nueva (mismo ID y aux) */
 	nCb = 0;
 	drv_tiempo_esperar_ms(200 + TOL_MS);
 	return nCb == 0;                                                 /* la de 200 ms ya no existe */

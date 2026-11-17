@@ -70,6 +70,7 @@ void actualizarTimers(Tiempo_ms_t tiempoTranscurrido){
 static uint8_t iniciado = 0;
 
 err_t svc_alarma_iniciar(CALLBACK_T cb_a_llamar){
+	f_cb = cb_a_llamar;
 	if(iniciado != 0){return ERROR_SINERROR;}
 	svc_GE_iniciar();
 	drv_tiempo_iniciar();
@@ -78,7 +79,6 @@ err_t svc_alarma_iniciar(CALLBACK_T cb_a_llamar){
 	ev_A_PERIODICA = svc_GE_reservar_ID();
 	svc_GE_suscribir(ev_A_PERIODICA, 0, svc_alarma_actualizar);
 	periodo_timer_periodico = 0x00FFFFFF;//Si no hay alarmas, que no moleste mucho a ser posible
-	f_cb = cb_a_llamar;
 	drv_tiempo_periodico_ms(periodo_timer_periodico, f_cb, ev_A_PERIODICA);
 	ultimaActualizacion = drv_tiempo_actual_ms();
 	iniciado = 1;
@@ -99,7 +99,7 @@ err_t svc_alarma_activar(uint32_t alarma_flags, EVENTO_T ID_evento, uint32_t aux
 		if(alarmasActivas[i].activa == false && hueco_alarma == -1){
 			hueco_alarma = i;//El primer hueco encontrado
 		}
-		if(alarmasActivas[i].idEvento == ID_evento){
+		if(alarmasActivas[i].idEvento == ID_evento && alarmasActivas[i].auxData == auxData){
 			alarma_encontrada = i;
 			break;
 		}

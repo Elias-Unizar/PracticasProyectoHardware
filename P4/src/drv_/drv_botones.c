@@ -5,9 +5,9 @@
 #include "svc_alarma.h"
 #include "rt_FIFO.h"
 
-#define T_REBOTE_PRESION_MS 1
-#define T_ENCUESTA_PERIODICA_MS 1
-#define T_REBOTE_DISPERSION_MS 1
+#define T_REBOTE_PRESION_MS 15
+#define T_ENCUESTA_PERIODICA_MS 20
+#define T_REBOTE_DISPERSION_MS 15
 
 typedef enum{
 	E_BOTON_REPOSO = 0,

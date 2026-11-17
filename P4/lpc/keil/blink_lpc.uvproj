@@ -686,6 +686,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\tests\test_svc_GE.h</FilePath>
             </File>
+            <File>
+              <FileName>test_botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_botones.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_botones.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

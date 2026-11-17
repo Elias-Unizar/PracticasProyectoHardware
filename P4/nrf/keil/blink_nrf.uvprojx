@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>BOARD_PCA10056 NRF52840_XXAA CONFIG_GPIO_AS_PINRESET FLOAT_ABI_HARD  __HEAP_SIZE=8192 __STACK_SIZE=8192</Define>
               <Undefine></Undefine>
-              <IncludePath>../src_nrf;../../src;../../src/drv_;../../src/hal_h;../../src/svc_</IncludePath>
+              <IncludePath>../src_nrf;../../src;../../src/drv_;../../src/hal_h;../../src/svc_;../../src/tests;../../src/runtime;../../src/app</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -383,34 +383,29 @@
           <GroupName>Source Comun</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\src\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>board.h</FileName>
+              <FileName>env.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\src\board.h</FilePath>
+              <FilePath>..\..\src\env.h</FilePath>
             </File>
             <File>
               <FileName>rt_fifo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\src\rt_fifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>rt_evento_t.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\rt_evento_t.h</FilePath>
+              <FilePath>..\..\src\runtime\rt_fifo.c</FilePath>
             </File>
             <File>
               <FileName>rt_fifo.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\src\rt_fifo.h</FilePath>
+              <FilePath>..\..\src\runtime\rt_fifo.h</FilePath>
             </File>
             <File>
-              <FileName>mod_tests.c</FileName>
+              <FileName>rt_GE.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\src\mod_tests.c</FilePath>
+              <FilePath>..\..\src\runtime\rt_GE.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt_GE.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\runtime\rt_GE.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -441,6 +436,36 @@
               <FileName>hal_consumo_nrf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src_nrf\hal_consumo_nrf.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_ext_int_nrf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src_nrf\hal_ext_int_nrf.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Hal_H</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_consumo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_consumo.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_gpio.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_gpio.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_tiempo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_tiempo.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_ext_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_ext_int.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -487,28 +512,155 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\drv_\drv_tiempo.h</FilePath>
             </File>
+            <File>
+              <FileName>board.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\board.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_botones.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_botones.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Services</GroupName>
-        </Group>
-        <Group>
-          <GroupName>Hal_H</GroupName>
           <Files>
             <File>
-              <FileName>hal_consumo.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\src\hal_h\hal_consumo.h</FilePath>
+              <FileName>svc_alarma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\svc_\svc_alarma.c</FilePath>
             </File>
             <File>
-              <FileName>hal_gpio.h</FileName>
+              <FileName>svc_alarma.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\src\hal_h\hal_gpio.h</FilePath>
+              <FilePath>..\..\src\svc_\svc_alarma.h</FilePath>
             </File>
             <File>
-              <FileName>hal_tiempo.h</FileName>
+              <FileName>svc_diagnostico.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\svc_\svc_diagnostico.c</FilePath>
+            </File>
+            <File>
+              <FileName>svc_diagnostico.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\src\hal_h\hal_tiempo.h</FilePath>
+              <FilePath>..\..\src\svc_\svc_diagnostico.h</FilePath>
+            </File>
+            <File>
+              <FileName>svc_GE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\svc_\svc_GE.c</FilePath>
+            </File>
+            <File>
+              <FileName>svc_GE.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\svc_\svc_GE.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Tests</GroupName>
+          <Files>
+            <File>
+              <FileName>main-test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\main-test.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_botones.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_botones.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_consumo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_consumo.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_consumo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_consumo.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_fifo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_fifo.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_led.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_led.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_alarma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_svc_alarma.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_alarma.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_svc_alarma.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_diagnostico.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_svc_diagnostico.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_diagnostico.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_svc_diagnostico.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_GE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_svc_GE.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_svc_GE.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_svc_GE.h</FilePath>
+            </File>
+            <File>
+              <FileName>test_tiempo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_tiempo.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_tiempo.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_tiempo.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\app\main.c</FilePath>
             </File>
           </Files>
         </Group>

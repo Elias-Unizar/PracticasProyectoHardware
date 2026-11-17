@@ -6,7 +6,7 @@
 
 #define EVENT_TYPES 8 //Sin el ev_VOID
 
-typedef void (*CALLBACK_T)();
+typedef void (*CALLBACK_T)();//(evento, aux)
 typedef uint32_t EVENTO_T;
 
 #define ev_VOID 0

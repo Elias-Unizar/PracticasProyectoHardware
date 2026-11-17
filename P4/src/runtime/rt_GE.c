@@ -173,3 +173,8 @@ void rt_GE_iniciar(){
 	svc_GE_suscribir(ev_USUARIO, 5, rt_GE_actualizar);
 	svc_GE_suscribir(ev_INACTIVIDAD, 0, rt_GE_actualizar);
 }
+
+
+/*Alarma en 2s -> ev_ALARMA
+Boton se pulsa -> ev_BOTON_PULSADO -> svc_alarma_activar(mismo evento, mismo aux) = sobreescribe la alarma anterior
+*/

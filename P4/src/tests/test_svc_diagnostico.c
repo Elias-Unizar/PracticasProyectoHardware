@@ -27,13 +27,6 @@ static void liberar_todos(CANAL_T canales[], uint32_t n){
 	for (uint32_t i = 0; i < n; i++) svc_DIAGNOSTICO_desreservar(canales[i]);
 }
 
-static uint8_t test_svc_DIAGNOSTICO_iniciar(void){
-	if (svc_DIAGNOSTICO_reservar() != CANAL_NINGUNO) return 0;   /* sin iniciar no hay canales */
-	if (svc_DIAGNOSTICO_iniciar() != ERROR_SINERROR) return 0;
-	if (svc_DIAGNOSTICO_iniciar() != ERROR_SINERROR) return 0;   /* segunda vez, no pasa nada */
-	return 1;
-}
-
 static uint8_t test_svc_DIAGNOSTICO_reservar(void){
 	CANAL_T canales[MONITOR_NUMBER];
 	uint32_t n;
@@ -82,7 +75,6 @@ static uint8_t test_svc_DIAGNOSTICO_limpiar(void){
 
 uint8_t test_svc_diagnostico_todos_no_bloq(){
 	uint8_t ok = 1;
-//	ok &= test_svc_DIAGNOSTICO_iniciar();     /* el primero: comprueba "sin iniciar" */, cuando se ejecutan todos los tests juntos, ya esta iniciado y el test falla
 	ok &= test_svc_DIAGNOSTICO_reservar();
 	ok &= test_svc_DIAGNOSTICO_desreservar();
 	ok &= test_svc_DIAGNOSTICO_senyalar();

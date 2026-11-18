@@ -30,6 +30,9 @@
 #ifdef TEST_BOTONES
 #include "test_botones.h"
 #endif
+#ifdef TEST_WATCHDOG
+#include "test_watchdog.h"
+#endif
 /* Un bit por modulo; 0 = todo bien. Se puede mirar en el debugger. */
 
 volatile uint32_t tests_fallos = 0;
@@ -79,7 +82,13 @@ int main(void){
 	if (!test_drv_botones_todos()) tests_fallos = 1;
 	while(tests_fallos != 0){;}
 #endif
-
+		
+#ifdef TEST_WATCHDOG
+	if (!test_drv_watchdog_todos()) tests_fallos = 1;
+	test_drv_watchdog_reset();
+	while(tests_fallos != 0){;}
+#endif
+		
 	/* En sistemas empotrados no se retorna */
 	while (1) { /* idle */ }
 }

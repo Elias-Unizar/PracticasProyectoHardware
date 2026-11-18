@@ -442,6 +442,16 @@
               <FileType>1</FileType>
               <FilePath>..\src_nrf\hal_ext_int_nrf.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_watchdog_nrf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src_nrf\hal_watchdog_nrf.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_irq_nrf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src_nrf\hal_irq_nrf.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -466,6 +476,16 @@
               <FileName>hal_ext_int.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\src\hal_h\hal_ext_int.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_irq.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_irq.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_watchdog.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\hal_h\hal_watchdog.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -526,6 +546,26 @@
               <FileName>drv_botones.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\src\drv_\drv_botones.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_sc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_sc.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_sc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_sc.h</FilePath>
+            </File>
+            <File>
+              <FileName>drv_watchdog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\drv_\drv_watchdog.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_watchdog.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\drv_\drv_watchdog.h</FilePath>
             </File>
           </Files>
         </Group>

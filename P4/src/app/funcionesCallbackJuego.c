@@ -46,21 +46,17 @@ static uint32_t tiempoEncendido_ms(void){
     return T_ENCENDIDO_INICIAL_MS - reduccion;
 }
 
-/* Programa (o reprograma, mismo evento y aux) la alarma del juego. 0 = cancela */
-static void programarTimeout(uint32_t ms){
-    (void)svc_alarma_activar(svc_alarma_codificar(false, ms, 0), ev_JUEGO_TIMEOUT, 0);
-}
 
 static void reiniciarPartida(void){
     establecerLedsJuego(LED_OFF);
     puntos = 0;
     fallos = 0;
     ledActual = 1;
-    programarTimeout(T_PAUSA_ENTRE_LEDS_MS);
+    svc_alarma_activar(svc_alarma_codificar(false, T_PAUSA_ENTRE_LEDS_MS, 0), ev_JUEGO_TIMEOUT, 0);
     estado = led_apagado;
 }
 
-static void terminarRonda(bool acierto){
+void terminarRonda(bool acierto){
     (void)drv_led_establecer((LED_id_t)ledActual, LED_OFF);
     if(acierto){
         puntos++;
@@ -71,16 +67,16 @@ static void terminarRonda(bool acierto){
     ledActual = (ledActual % ledsJuego) + 1;
 
     if(fallos >= FALLOS_MAXIMOS){
-        programarTimeout(0);
+        svc_alarma_activar(svc_alarma_codificar(false, 0, 0), ev_JUEGO_TIMEOUT, 0);
         establecerLedsJuego(LED_ON);
         estado = estado_fin;
     }else{
-        programarTimeout(T_PAUSA_ENTRE_LEDS_MS);
+        svc_alarma_activar(svc_alarma_codificar(false, T_PAUSA_ENTRE_LEDS_MS, 0), ev_JUEGO_TIMEOUT, 0);
         estado = led_apagado;
     }
 }
 
-static void actualizarJuego(EVENTO_T evento, uint32_t aux){
+void actualizarJuego(EVENTO_T evento, uint32_t aux){
     switch(estado){
         case estado_inicial:
             break;  /* iniciarJuego lo deja en led_apagado */
@@ -88,7 +84,7 @@ static void actualizarJuego(EVENTO_T evento, uint32_t aux){
         case led_apagado:
             if(evento == ev_JUEGO_TIMEOUT){
                 (void)drv_led_establecer((LED_id_t)ledActual, LED_ON);
-                programarTimeout(tiempoEncendido_ms());
+                svc_alarma_activar(svc_alarma_codificar(false, tiempoEncendido_ms(), 0), ev_JUEGO_TIMEOUT, 0);
                 estado = led_encendido;
             }
             break;
@@ -112,7 +108,7 @@ static void actualizarJuego(EVENTO_T evento, uint32_t aux){
 void iniciarJuego(EVENTO_T ev_pulsar_boton){
     ev_PULSA = ev_pulsar_boton;
     ev_JUEGO_TIMEOUT = svc_GE_reservar_ID();
-    (void)svc_GE_suscribir(ev_JUEGO_TIMEOUT, 1, actualizarJuego);
-    (void)svc_GE_suscribir(ev_PULSA, 1, actualizarJuego);
+    svc_GE_suscribir(ev_JUEGO_TIMEOUT, 1, actualizarJuego);
+    svc_GE_suscribir(ev_PULSA, 1, actualizarJuego);
     reiniciarPartida();
 }

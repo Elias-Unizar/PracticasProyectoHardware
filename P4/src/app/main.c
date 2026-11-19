@@ -158,7 +158,6 @@ void whackAMole(void){
 	rt_GE_iniciar();                          //iniciamos FIFO, alarmas, GE y consumo 
 	ev_pulsar_boton = svc_GE_reservar_ID();
 	drv_botones_iniciar(rt_FIFO_encolar, ev_pulsar_boton);
-	rt_GE_asignar_evento_usuario(ev_pulsar_boton);  
 	iniciarJuego(ev_pulsar_boton);
 	rt_GE_lanzador();                         
 }

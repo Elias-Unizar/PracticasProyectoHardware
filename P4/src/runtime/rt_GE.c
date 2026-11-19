@@ -2,7 +2,7 @@
 #include "drv_consumo.h"
 #include "rt_fifo.h"
 #include "svc_alarma.h"
-#include "drv_botones.h"
+#include "bot
 
 #define rt_GE_MAX_SUSCRITOS 4
 
@@ -177,10 +177,6 @@ void rt_GE_iniciar(){
 }
 
 
-void rt_GE_asignar_evento_usuario(EVENTO_T ev){
-	ev_USUARIO = ev;
-	(void)svc_GE_suscribir(ev_USUARIO, 5, rt_GE_actualizar);
-}
 
 
 

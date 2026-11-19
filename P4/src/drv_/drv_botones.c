@@ -46,7 +46,9 @@ uint32_t drv_botones_iniciar(void (*cb_a_llamar)(), EVENTO_T ev_1){
 	svc_GE_suscribir(ev_PULSA_BOTON, 0, drv_botones_actualizar);
 	ev_BOTON_RETARDO = svc_GE_reservar_ID();
 	svc_GE_suscribir(ev_BOTON_RETARDO, 5, drv_botones_actualizar);
-	
+	for(uint32_t i = 0; i < BUTTONS_NUMBER; i++){
+		hal_ext_int_config_pin(listaBotones[i]);
+	}
 	return BUTTONS_NUMBER;
 }
 

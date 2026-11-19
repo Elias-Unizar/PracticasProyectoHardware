@@ -132,6 +132,7 @@ static void hal_tiempo_periodico_set_callback(void (*cb)()) {
 
 void hal_tiempo_periodico_enable(bool enable) {
     if (enable) {
+				NRF_TIMER1->TASKS_CLEAR = 1;
         NVIC_EnableIRQ(TIMER1_IRQn);
         NRF_TIMER1->TASKS_START = 1;
     } else {

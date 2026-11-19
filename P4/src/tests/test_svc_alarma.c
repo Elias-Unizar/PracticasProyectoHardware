@@ -16,7 +16,7 @@ void decodificar_flags(uint32_t alarma_flags, bool *esPeriodico, Tiempo_ms_t *re
 static volatile uint32_t nCb = 0;
 static volatile EVENTO_T ultimoEv = 0;
 static volatile uint32_t ultimoAux = 0;
-static void cb_alarma(EVENTO_T ev, uint32_t aux){
+void cb_alarma(EVENTO_T ev, uint32_t aux){
 	nCb++;
 	ultimoEv = ev;
 	ultimoAux = aux;
@@ -72,8 +72,10 @@ static uint8_t test_svc_alarma_activar(void){
 
 static uint8_t test_svc_alarma_actualizar(void){
 	nCb = 0;
+	svc_alarma_iniciar(cb_alarma);
 	svc_alarma_activar(svc_alarma_codificar(false, 20, 0), 3, 7);   /* evento 3, aux 7, a los 20 ms */
 	drv_tiempo_esperar_ms(25);
+
 	if (nCb == 0) return 0;                               /* el timer no ha avisado */
 	svc_alarma_actualizar(ultimoEv, ultimoAux);           /* lo que haria el GE al sacarlo de la FIFO */
 	return (ultimoEv == 3) && (ultimoAux == 7);

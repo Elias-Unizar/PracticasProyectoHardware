@@ -73,6 +73,7 @@ uint8_t test_drv_watchdog_todos(void){
  * Si sale del bucle sin resetear, falla. */
 uint8_t test_drv_watchdog_reset(void){
 	uint32_t n = drv_watchdog_numero_canales();
+	alimentar_todos_durante(2 * ESPERA_MS);
 	rt_FIFO_inicializar();
 	for(uint32_t i = 0; i < 32; i++)rt_FIFO_encolar(1,1);
 	rt_FIFO_encolar(1,1);

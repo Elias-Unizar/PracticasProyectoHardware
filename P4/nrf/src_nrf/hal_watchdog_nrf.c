@@ -26,10 +26,10 @@ void hal_watchdog_iniciar(uint32_t segundos){
 }
 
 void hal_watchdog_configurar(uint32_t canalWatchdog){
-	if(canalWatchdog < 8)configurado[canalWatchdog] = 1;
+	if(canalWatchdog > 8)configurado[canalWatchdog] = 1;
 }
 
 void hal_watchdog_alimentar(uint32_t canalWatchdog){
-	if(canalWatchdog < 8 || NRF_WDT->RUNSTATUS == 0) return;
+	if(canalWatchdog > 8) return;
 	NRF_WDT->RR[canalWatchdog] = WDT_RR_RR_Reload;
 }

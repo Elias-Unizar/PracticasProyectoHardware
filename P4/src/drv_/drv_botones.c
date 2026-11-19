@@ -89,3 +89,11 @@ void drv_botones_actualizar(EVENTO_T evento, id_boton_t botonAct){
 			break;
 	}
 }
+
+void drv_botones_habilitar_despertar (id_boton_t boton){
+	hal_ext_int_habilitar_despertar(listaBotones[boton]);
+}
+
+void drv_botones_deshabilitar_despertar (id_boton_t boton){
+	hal_ext_int_deshabilitar_despertar(listaBotones[boton]);
+}

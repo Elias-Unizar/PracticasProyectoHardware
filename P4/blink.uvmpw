@@ -9,7 +9,6 @@
 
   <project>
     <PathAndName>.\lpc\keil\blink_lpc.uvproj</PathAndName>
-    <NodeIsExpanded>1</NodeIsExpanded>
   </project>
 
   <project>

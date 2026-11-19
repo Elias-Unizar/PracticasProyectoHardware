@@ -312,8 +312,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -692,6 +692,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\src\tests\test_tiempo.h</FilePath>
             </File>
+            <File>
+              <FileName>test_watchdog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\tests\test_watchdog.c</FilePath>
+            </File>
+            <File>
+              <FileName>test_watchdog.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\tests\test_watchdog.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -701,6 +711,16 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\src\app\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>funcionesCallbackJuego.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\src\app\funcionesCallbackJuego.c</FilePath>
+            </File>
+            <File>
+              <FileName>funcionesCallBackJuego.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\src\app\funcionesCallBackJuego.h</FilePath>
             </File>
           </Files>
         </Group>

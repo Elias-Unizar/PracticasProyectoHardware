@@ -1,14 +1,14 @@
 /* *****************************************************************************
  * P.H.2025: main.c
  *
- * Programa principal de la práctica 2 de Proyecto Hardware.
+ * Programa principal de la prï¿½ctica 2 de Proyecto Hardware.
  *
  * - Inicializa la HAL de GPIO y el driver de LEDs.
- * - Invoca a las funciones de parpadeo (blink_v1 o blink_v2) según la sesión.
+ * - Invoca a las funciones de parpadeo (blink_v1 o blink_v2) segï¿½n la sesiï¿½n.
  *
- * Versión de prácticas:
- *   - Sesión 1: blink_v1 -> parpadeo con retardo por bucle de instrucciones.
- *   - Sesión 2: blink_v2 -> parpadeo controlado por temporizador.
+ * Versiï¿½n de prï¿½cticas:
+ *   - Sesiï¿½n 1: blink_v1 -> parpadeo con retardo por bucle de instrucciones.
+ *   - Sesiï¿½n 2: blink_v2 -> parpadeo controlado por temporizador.
  *
  * Notas:
  *   - El identificador de LED comienza en 1 (primer LED definido en board.h).
@@ -31,6 +31,9 @@
 #include "drv_consumo.h"
 #include "drv_monitor.h"
 #include "rt_fifo.h"
+#include "drv_botones.h"
+#include "rt_GE.h"
+#include "funcionesCallbackJuego.h"
 
 /* Constante de retardo en milisegundos */
 #define RETARDO_MS 500u 		 /* ejemplo: medio segundo */
@@ -40,7 +43,7 @@
 /* *****************************************************************************
  * BLINK v1: parpadeo de un LED conmutando on/off.
  * Retardo por bucle de instrucciones (busy-wait). Solo usa el driver de LEDs.
- * para realizar la primera sesión de la practica
+ * para realizar la primera sesiï¿½n de la practica
  */
 void blink_v1(LED_id_t id) {
 
@@ -71,11 +74,11 @@ void blink_v2(LED_id_t id) {
 	
     /* Bucle principal: conmutar con temporizador */
     while (true) {
-        siguiente_activacion += RETARDO_MS;     /* calcular la siguiente activación */
+        siguiente_activacion += RETARDO_MS;     /* calcular la siguiente activaciï¿½n */
         siguiente_activacion = drv_tiempo_esperar_hasta_ms(siguiente_activacion);
         (void)drv_led_conmutar(id);
 
-        /* Aquí podrían añadirse otras tareas periódicas */
+        /* Aquï¿½ podrï¿½an aï¿½adirse otras tareas periï¿½dicas */
     }
 }
 #endif
@@ -113,6 +116,53 @@ void blink_v4(LED_id_t id){
 }
 #endif
 
+#if VERSION_BLINK_EJECUTAR == 5
+#include "board.h"
+#include "drv_botones.h"
+
+#define PALPITACIONES_MAX 10u
+static volatile uint32_t palpitaciones = 0;
+
+/* Callback del timer periÃ³dico (contexto IRQ): lo mÃ­nimo posible */
+static void blink_bis_cb(uint32_t id){
+	drv_led_conmutar((LED_id_t)id);
+	palpitaciones++;
+}
+
+static EVENTO_T ev_PULSARBOTON;
+void blink_v3_bis(LED_id_t id){
+	while(true){                       /* en LPC, si "continuar" tras despertar, reinicia el ciclo */
+		palpitaciones = 0;
+		drv_led_establecer(id, LED_ON);
+		drv_tiempo_periodico_ms(RETARDO_MS, blink_bis_cb, id);
+
+		while(palpitaciones < PALPITACIONES_MAX){
+			drv_consumo_esperar();
+		}
+
+		drv_tiempo_parar_periodico();
+
+		for(LED_id_t i = 1; i <= (LED_id_t)LEDS_NUMBER; i++){
+			drv_led_establecer(i, LED_OFF);
+		}
+
+		drv_botones_preparar_despertar();
+		drv_consumo_dormir();
+	}
+}
+#endif
+
+#if VERSION_BLINK_EJECUTAR == 6
+void whackAMole(void){
+	EVENTO_T ev_pulsar_boton;
+	rt_GE_iniciar();                          //iniciamos FIFO, alarmas, GE y consumo 
+	ev_pulsar_boton = svc_GE_reservar_ID();
+	drv_botones_iniciar(rt_FIFO_encolar, ev_pulsar_boton);
+	iniciarJuego(ev_pulsar_boton);
+	rt_GE_lanzador();                         
+}
+#endif
+
 /* *****************************************************************************
  * MAIN, Programa principal.
  * para la primera sesion se debe usar la funcion de blink_v1 sin temporizadores
@@ -121,38 +171,46 @@ void blink_v4(LED_id_t id){
 int main(void){
 	uint32_t Num_Leds;
 
-  /* Init tiempo, es un reloj que indica el tiempo desde que comenzo la ejecución */
+  /* Init tiempo, es un reloj que indica el tiempo desde que comenzo la ejecuciï¿½n */
 //	bool error = drv_tiempo_iniciar(); // para la sesion 2 de practica 2
 	
 	hal_gpio_iniciar();	// llamamos a iniciar gpio antesde que lo hagan los drivers
-	/* Configurar LEDs (IDs válidos: 1..num_leds) */
+	/* Configurar LEDs (IDs vï¿½lidos: 1..num_leds) */
 	Num_Leds = drv_leds_iniciar();
 	/*Inicializa el timer monotono, los structs de datos internos de ambos relojes, periodico y no periodico*/
 	drv_tiempo_iniciar();
 	/*Inicializa primero los monitores, son como LEDS*/
 	drv_monitor_iniciar();
 	/*Inicializa los registtos de manera adecuada para que ademas del drv_esperar funcione el drv_dormir*/
-	drv_consumo_iniciar((Monitor_id_t)3, 2);//Para debug le añadimos el monitor 3
+	drv_consumo_iniciar();//Para debug le aï¿½adimos el monitor 3
 	
-	rt_FIFO_inicializar((Monitor_id_t)4);
+	//rt_FIFO_inicializar((Monitor_id_t)4); De momento lo comento para no inicializar 2 veces la cola en el juego, en el juego se inicializa con rt_GE_iniciar en el juego
 	if (Num_Leds > 0){
 			#if VERSION_BLINK_EJECUTAR == 1
-			/* Sesión 1: parpadeo por lazo ocupado */
+			/* Sesiï¿½n 1: parpadeo por lazo ocupado */
 			blink_v1((LED_id_t)1);
 			#endif
 			#if VERSION_BLINK_EJECUTAR == 2
-			// Sesión 2: temporizador (cuando esté disponible)
+			// Sesiï¿½n 2: temporizador (cuando estï¿½ disponible)
 			blink_v2((LED_id_t)2);
 			#endif
 			
 			#if VERSION_BLINK_EJECUTAR == 3
-			// Sesión 1: Practica 3
+			// Sesiï¿½n 1: Practica 3
 			blink_v3((LED_id_t)3);
 			#endif
 		
 			#if VERSION_BLINK_EJECUTAR == 4
-			// Sesión 2: Practica 3
+			// Sesiï¿½n 2: Practica 3
 			blink_v4((LED_id_t)4);
+			#endif
+			
+			#if VERSION_BLINK_EJECUTAR == 5
+			blink_v3_bis((LED_id_t)3);
+			#endif
+			
+			#if VERSION_BLINK_EJECUTAR == 6
+			whackAMole();
 			#endif
     }
     /* En sistemas empotrados normalmente no se retorna */

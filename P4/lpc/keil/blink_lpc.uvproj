@@ -711,6 +711,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\src\app\funcionesCallbackJuego.c</FilePath>
             </File>
+            <File>
+              <FileName>funcionesCallBackJuego.h</FileName>
+              <FileType>9</FileType>
+              <FilePath>..\..\src\app\funcionesCallBackJuego.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

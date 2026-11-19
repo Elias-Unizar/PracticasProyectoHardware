@@ -2,6 +2,7 @@
 #include "drv_consumo.h"
 #include "rt_fifo.h"
 #include "svc_alarma.h"
+#include "drv_botones.h"
 
 #define rt_GE_MAX_SUSCRITOS 4
 
@@ -131,6 +132,7 @@ err_t svc_GE_cancelar(EVENTO_T ID_evento, CALLBACK_T f_callback){
 
 void rt_GE_actualizar(EVENTO_T ID_evento, uint32_t auxiliar){
 	if(ID_evento == ev_INACTIVIDAD){
+		drv_botones_preparar_despertar();
 		drv_consumo_dormir();
 	}else if(ID_evento == ev_USUARIO){
 		svc_alarma_activar(svc_alarma_codificar(0, 20*1000, 0), ev_INACTIVIDAD, 0); 
@@ -173,6 +175,13 @@ void rt_GE_iniciar(){
 	svc_GE_suscribir(ev_USUARIO, 5, rt_GE_actualizar);
 	svc_GE_suscribir(ev_INACTIVIDAD, 0, rt_GE_actualizar);
 }
+
+
+void rt_GE_asignar_evento_usuario(EVENTO_T ev){
+	ev_USUARIO = ev;
+	(void)svc_GE_suscribir(ev_USUARIO, 5, rt_GE_actualizar);
+}
+
 
 
 /*Alarma en 2s -> ev_ALARMA

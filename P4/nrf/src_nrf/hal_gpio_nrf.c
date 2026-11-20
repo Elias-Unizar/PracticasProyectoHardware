@@ -3,15 +3,17 @@
  */
 #include "nrf.h"
 #include "hal_gpio.h"
-
+#include <stdint.h>
 /**
  * @brief Inicializa el subsistema GPIO.
  *
  * Debe invocarse antes de usar el resto de funciones.
  * Reconfigura todos los pines como entradas para evitar cortocircuitos.
  */
+ static uint8_t iniciado = 0;
 void hal_gpio_iniciar(void){
-	NRF_GPIO->DIR = 0x0;
+	if(iniciado == 0)NRF_GPIO->DIR = 0x0;
+	iniciado = 1;
 }
 
 /**

@@ -20,7 +20,7 @@
 #include "env.h"
 #ifndef ACTIVAR_TEST
 
-#define VERSION_BLINK_EJECUTAR 4
+#define VERSION_BLINK_EJECUTAR 5
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -117,16 +117,18 @@ void blink_v4(LED_id_t id){
 #endif
 
 #if VERSION_BLINK_EJECUTAR == 5
-#include "board.h"
-#include "drv_botones.h"
 
 #define PALPITACIONES_MAX 10u
 static volatile uint32_t palpitaciones = 0;
 
 /* Callback del timer periódico (contexto IRQ): lo mínimo posible */
-static void blink_bis_cb(uint32_t id){
-	drv_led_conmutar((LED_id_t)id);
+static void blink_bis_cb(EVENTO_T ev, uint32_t id){
+	drv_led_conmutar((LED_id_t)2);
 	palpitaciones++;
+	if(palpitaciones == 10){
+		drv_botones_habilitar_despertar(1);
+		drv_consumo_dormir();
+	}
 }
 
 static EVENTO_T ev_PULSARBOTON;
@@ -134,20 +136,13 @@ void blink_v3_bis(LED_id_t id){
 	while(true){                       /* en LPC, si "continuar" tras despertar, reinicia el ciclo */
 		palpitaciones = 0;
 		drv_led_establecer(id, LED_ON);
-		drv_tiempo_periodico_ms(RETARDO_MS, blink_bis_cb, id);
-
-		while(palpitaciones < PALPITACIONES_MAX){
-			drv_consumo_esperar();
-		}
-
-		drv_tiempo_parar_periodico();
-
-		for(LED_id_t i = 1; i <= (LED_id_t)LEDS_NUMBER; i++){
-			drv_led_establecer(i, LED_OFF);
-		}
-
-		drv_botones_preparar_despertar();
-		drv_consumo_dormir();
+		svc_GE_iniciar();
+		ev_PULSARBOTON = svc_GE_reservar_ID();
+		rt_GE_iniciar(ev_PULSARBOTON);
+		drv_botones_iniciar(rt_FIFO_encolar, ev_PULSARBOTON);
+		svc_GE_suscribir(ev_PULSARBOTON, 1, blink_bis_cb);
+		rt_GE_lanzador();	
+		
 	}
 }
 #endif
@@ -169,21 +164,7 @@ void whackAMole(void){
  * para la entrega final se debe incocar blink_v2
  */
 int main(void){
-	uint32_t Num_Leds;
-
-  /* Init tiempo, es un reloj que indica el tiempo desde que comenzo la ejecuci�n */
-//	bool error = drv_tiempo_iniciar(); // para la sesion 2 de practica 2
-	
-	hal_gpio_iniciar();	// llamamos a iniciar gpio antesde que lo hagan los drivers
-	/* Configurar LEDs (IDs v�lidos: 1..num_leds) */
-	Num_Leds = drv_leds_iniciar();
-	/*Inicializa el timer monotono, los structs de datos internos de ambos relojes, periodico y no periodico*/
-	drv_tiempo_iniciar();
-	/*Inicializa primero los monitores, son como LEDS*/
-	drv_monitor_iniciar();
-	/*Inicializa los registtos de manera adecuada para que ademas del drv_esperar funcione el drv_dormir*/
-	drv_consumo_iniciar();//Para debug le a�adimos el monitor 3
-	
+	uint32_t Num_Leds = drv_leds_iniciar();
 	//rt_FIFO_inicializar((Monitor_id_t)4); De momento lo comento para no inicializar 2 veces la cola en el juego, en el juego se inicializa con rt_GE_iniciar en el juego
 	if (Num_Leds > 0){
 			#if VERSION_BLINK_EJECUTAR == 1
@@ -206,7 +187,7 @@ int main(void){
 			#endif
 			
 			#if VERSION_BLINK_EJECUTAR == 5
-			blink_v3_bis((LED_id_t)3);
+			blink_v3_bis((LED_id_t)2);
 			#endif
 			
 			#if VERSION_BLINK_EJECUTAR == 6

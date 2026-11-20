@@ -5,6 +5,7 @@
 
 #include <nrf.h>
 #include "hal_ext_int.h"
+#include "board.h"
 //Asocia canales GPIO(posiciones del vector) a los pines que contiene el vector
 static uint32_t canalGPIOTE_pin[8];
 
@@ -132,4 +133,10 @@ void hal_ext_int_deshabilitar_despertar(uint32_t pin) {
     NRF_GPIO->PIN_CNF[pin & 0x1F] &= ~(GPIO_PIN_CNF_SENSE_Msk);//La Msk ya son los propios bits de posicion del sense a 1, 
 		//negarlos los pone todos a 0, y el resto de bits que estaban todos a 0, a 1, asi que no borra configuracion previa
 	}
+}
+
+uint32_t hal_ext_int_activo(uint32_t pin) {
+	if((pin & 0x20) != 0) return 0;// puerto 1: no implementado, siempre esta sin activar
+	uint32_t mascaraPin = 1 << (pin & 0x1F);//Igual que en l GPIO, esta funcion simplemente existe porque el LPC es un tocahuevos
+	return ((NRF_GPIO->IN & mascaraPin) != 0) == BUTTONS_ACTIVE_STATE;
 }

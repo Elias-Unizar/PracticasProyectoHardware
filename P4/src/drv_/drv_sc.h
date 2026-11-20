@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-uint32_t enterSC(void);
+uint32_t drv_sc_enterSC(void);
 
-void exitSC(uint32_t previo);
+void drv_sc_exitSC(uint32_t previo);
 
 #endif

@@ -8,12 +8,7 @@ void EINT0_IRQ(void) __irq {
 	EXTINT = 1;
 }
 
-void hal_consumo_iniciar(){
-	EXTWAKE = 1; // EXTINT0 will awake the processor, mi querido boton 3; valores [1, 2, o 4]
-	//PLL maximo de 75MHz, pero el minimo son 10MHz 
-	//Locura que es el PLL con multiplicaciones y divisiones de frecuencias jajaja
-	//Futura posibiblidad de ahorrar energia con PCONP = Perifericos a activar y desactivar
-}
+void hal_consumo_iniciar(){}
 
 
 void hal_consumo_esperar(){
@@ -24,4 +19,5 @@ void hal_consumo_esperar(){
 void hal_consumo_dormir(){
 	PCON = 0x02; 
 	switch_to_PLL();
+	Reset_Handler();
 }

@@ -9,7 +9,7 @@
 * 4,5,6 = EINT0, EINT1, EINT2
 */
 
-#define ACTIVAR_TEST //Descomentar esta linea si se desea ejecutar tests
+//#define ACTIVAR_TEST //Descomentar esta linea si se desea ejecutar tests
 #define TEST_LEDS     //Tests basicos de leds y monitores
 #define TEST_TIEMPO   //Tests muy basicos de temporizadores
 #define TEST_CONSUMO  //Tests manuales, en los que comprobar

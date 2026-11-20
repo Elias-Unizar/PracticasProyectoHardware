@@ -96,12 +96,12 @@ err_t svc_alarma_activar(uint32_t alarma_flags, EVENTO_T ID_evento, uint32_t aux
 	int32_t hueco_alarma = -1;
 	int32_t alarma_encontrada = -1;
 	for(uint32_t i = 0; i < svc_ALARMAS_MAX; i++){
-		if(alarmasActivas[i].activa == false && hueco_alarma == -1){
-			hueco_alarma = i;//El primer hueco encontrado
-		}
 		if(alarmasActivas[i].idEvento == ID_evento && alarmasActivas[i].auxData == auxData){
 			alarma_encontrada = i;
 			break;
+		}
+		if(alarmasActivas[i].activa == false && hueco_alarma == -1){
+			hueco_alarma = i;//El primer hueco encontrado
 		}
 	}
 	if(alarma_encontrada == -1 && hueco_alarma == -1){
@@ -125,7 +125,7 @@ void svc_alarma_actualizar(EVENTO_T evento, uint32_t aux){
 	if(evento == ev_A_PERIODICA){
 		actualizarTimers(periodo_timer_periodico);
 		for(uint32_t i = 0; i < svc_ALARMAS_MAX; i++){
-			if(alarmasActivas[i].activa == true && alarmasActivas[i].tiempoRestante_ms <= 0){
+			if(alarmasActivas[i].activa == true && alarmasActivas[i].tiempoRestante_ms == 0){
 				f_cb(alarmasActivas[i].idEvento, alarmasActivas[i].auxData);
 				if(!alarmasActivas[i].esPeriodica){
 					alarmasActivas[i].activa = false;

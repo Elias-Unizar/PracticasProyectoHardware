@@ -9,7 +9,7 @@
 
 void rt_GE_lanzador(void);
 
-void rt_GE_iniciar(void);
+void rt_GE_iniciar(EVENTO_T ev_User);
 
 void rt_GE_actualizar(EVENTO_T ID_evento, uint32_t auxiliar);
 

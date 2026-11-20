@@ -161,13 +161,13 @@ void rt_GE_lanzador(){
 	}
 }
 
-void rt_GE_iniciar(){
+void rt_GE_iniciar(EVENTO_T ev_User){
 	rt_FIFO_inicializar();
 	svc_alarma_iniciar(rt_FIFO_encolar);
 	svc_GE_iniciar();
 	drv_consumo_iniciar();
 	
-	ev_USUARIO = svc_GE_reservar_ID();
+	ev_USUARIO = ev_User;
 	ev_INACTIVIDAD = svc_GE_reservar_ID();
 	//Si no se han podido reservar, han marcado ya internamente el canal de error
 	svc_GE_suscribir(ev_USUARIO, 5, rt_GE_actualizar);

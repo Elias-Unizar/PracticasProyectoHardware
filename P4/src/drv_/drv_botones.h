@@ -19,4 +19,8 @@ boton_status_t drv_botones_pulsado(id_boton_t boton);
 /*Funcion interna para usar con el rt_GE*/
 void drv_botones_actualizar(EVENTO_T evento, id_boton_t botonPulsado);
 
+void drv_botones_habilitar_despertar (id_boton_t boton);
+
+void drv_botones_deshabilitar_despertar (id_boton_t boton);
+
 #endif

@@ -64,6 +64,7 @@ static uint8_t iniciado = 0;
 unsigned int drv_leds_iniciar(){
 	#if LEDS_NUMBER > 0
 	if(iniciado != 0){return (unsigned int)LEDS_NUMBER;}
+		hal_gpio_iniciar();
     for (LED_id_t i = 1; i <= (LED_id_t)LEDS_NUMBER; ++i) {
         hal_gpio_sentido(s_led_list[i-1], HAL_GPIO_PIN_DIR_OUTPUT);
         /* Apagar por defecto respetando activo-alto/bajo */

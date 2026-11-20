@@ -24,7 +24,7 @@ static EVENTO_T ev_BOTON_RETARDO;
 
 id_boton_t buscarBotonDePin(uint32_t pin){
 	id_boton_t botonActivado = 0;
-	while(listaBotones[botonActivado] != pin){
+	while(botonActivado < BUTTONS_NUMBER && listaBotones[botonActivado] != pin){
 		botonActivado++;//Buscamos que boton fue el que estaba asociado al pin activado
 	}
 	return botonActivado;
@@ -48,6 +48,7 @@ uint32_t drv_botones_iniciar(void (*cb_a_llamar)(), EVENTO_T ev_1){
 	svc_GE_suscribir(ev_BOTON_RETARDO, 5, drv_botones_actualizar);
 	for(uint32_t i = 0; i < BUTTONS_NUMBER; i++){
 		hal_ext_int_config_pin(listaBotones[i]);
+		hal_ext_int_habilitar(listaBotones[i]);
 	}
 	return BUTTONS_NUMBER;
 }
@@ -77,7 +78,7 @@ void drv_botones_actualizar(EVENTO_T evento, id_boton_t botonAct){
 			break;
 		case E_BOTON_MUESTREO:
 			if(evento == ev_BOTON_RETARDO){
-				if(hal_gpio_leer(listaBotones[botonAct]) != BUTTONS_ACTIVE_STATE){
+				if(!hal_ext_int_activo(listaBotones[botonAct])){//ODIO EL LPC, pero bueno, a lo mejor esta mejor asi????????
 					svc_alarma_activar(svc_alarma_codificar(false, (Tiempo_ms_t)T_REBOTE_DISPERSION_MS, 0x0), ev_BOTON_RETARDO, botonAct);
 					estadosBotones[botonAct] = E_BOTON_SALIDA;
 				}

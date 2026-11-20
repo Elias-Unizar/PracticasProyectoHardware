@@ -30,5 +30,7 @@ void hal_ext_int_habilitar_despertar(uint32_t pin);
 
 void hal_ext_int_deshabilitar_despertar(uint32_t pin);
 
+uint32_t hal_ext_int_activo(uint32_t pin);
+
 
 #endif // HAL_EXT_INT_H

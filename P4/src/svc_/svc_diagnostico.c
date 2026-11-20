@@ -52,7 +52,7 @@ err_t svc_DIAGNOSTICO_desreservar(CANAL_T canal){
  
 err_t svc_DIAGNOSTICO_senyalar(CANAL_T canal){
 	if(canal != 0){
-		drv_monitor_marcar((MONITOR_id_t)canal);
+		drv_monitor_marcar((MONITOR_id_t)(canal+1));
 		return ERROR_SINERROR;
 	}else{
 		return ERROR_DIAGN_CANAL_INVALIDO;
@@ -61,7 +61,7 @@ err_t svc_DIAGNOSTICO_senyalar(CANAL_T canal){
  
 err_t svc_DIAGNOSTICO_limpiar(CANAL_T canal){
 	if(canal != 0){
-		drv_monitor_desmarcar((MONITOR_id_t)canal);
+		drv_monitor_desmarcar((MONITOR_id_t)(canal+1));
 		return ERROR_SINERROR;
 	}else{
 		return ERROR_DIAGN_CANAL_INVALIDO;
@@ -71,7 +71,7 @@ err_t svc_DIAGNOSTICO_limpiar(CANAL_T canal){
 	
 void svc_DIAGNOSTICO_error(){
 	if(total_monitores > 0){
-		drv_monitor_marcar(canalError);
+		drv_monitor_marcar((MONITOR_id_t)(canalError+1));
 		while(1){;}
 	}
 }

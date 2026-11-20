@@ -2,6 +2,7 @@
 #include "drv_consumo.h"
 #include "rt_fifo.h"
 #include "svc_alarma.h"
+#include "drv_botones.h"
 
 #define rt_GE_MAX_SUSCRITOS 4
 
@@ -128,9 +129,10 @@ err_t svc_GE_cancelar(EVENTO_T ID_evento, CALLBACK_T f_callback){
 }
 
 //IMPLEMENTACION DE FUNCIONES DE RT_GE.H
-
+static uint32_t numBotones = 0;
 void rt_GE_actualizar(EVENTO_T ID_evento, uint32_t auxiliar){
 	if(ID_evento == ev_INACTIVIDAD){
+		for(uint32_t i = 0; i < numBotones; i++) drv_botones_habilitar_despertar(i);
 		drv_consumo_dormir();
 	}else if(ID_evento == ev_USUARIO){
 		svc_alarma_activar(svc_alarma_codificar(0, 20*1000, 0), ev_INACTIVIDAD, 0); 
@@ -166,6 +168,7 @@ void rt_GE_iniciar(EVENTO_T ev_User){
 	svc_alarma_iniciar(rt_FIFO_encolar);
 	svc_GE_iniciar();
 	drv_consumo_iniciar();
+	numBotones = drv_botones_iniciar(rt_FIFO_encolar, ev_User);
 	
 	ev_USUARIO = ev_User;
 	ev_INACTIVIDAD = svc_GE_reservar_ID();

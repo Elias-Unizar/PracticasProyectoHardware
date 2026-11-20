@@ -34,11 +34,10 @@ void rt_FIFO_encolar(EVENTO_T ID_evento, uint32_t auxData){
 		svc_DIAGNOSTICO_error();
 	}else{
 		tamagnoActualCola += 1;
-		drv_sc_exitSC(estadoPrev);
-
 		ultimo_insertado = (ultimo_insertado + 1) % MAX_EVENTOS;
+		drv_sc_exitSC(estadoPrev);
 		Tiempo_us_t eventoTS = drv_tiempo_actual_us();
-		EVENTO eventoAInsertar = {ID_evento, auxData, eventoTS};
+		EVENTO eventoAInsertar = {ID_evento, auxData, eventoTS};		
 		ev_FIFO[ultimo_insertado] = eventoAInsertar;
 		veces_ejecutadas_EVENTO_T[ID_evento] += 1;
 		veces_ejecutadas_EVENTO_T[ev_VOID] += 1;

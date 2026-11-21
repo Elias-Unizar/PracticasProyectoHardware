@@ -1,6 +1,7 @@
 #include "env.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "board.h"
 #include "drv_leds.h"
@@ -43,7 +44,7 @@ static uint32_t tiempoEncendido_ms(void){
     if(reduccion >= (T_ENCENDIDO_INICIAL_MS - T_ENCENDIDO_MINIMO_MS)){
         return T_ENCENDIDO_MINIMO_MS;
     }
-    return T_ENCENDIDO_INICIAL_MS - reduccion;
+    return (T_ENCENDIDO_INICIAL_MS - reduccion) + ((uint32_t)rand() % (T_ENCENDIDO_MINIMO_MS + 1u));
 }
 
 

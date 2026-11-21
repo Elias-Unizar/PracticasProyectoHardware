@@ -20,7 +20,7 @@
 #include "env.h"
 #ifndef ACTIVAR_TEST
 
-#define VERSION_BLINK_EJECUTAR 5
+#define VERSION_BLINK_EJECUTAR 6
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -149,9 +149,10 @@ void blink_v3_bis(LED_id_t id){
 
 #if VERSION_BLINK_EJECUTAR == 6
 void whackAMole(void){
+	svc_GE_iniciar();
 	EVENTO_T ev_pulsar_boton;
-	rt_GE_iniciar();                          //iniciamos FIFO, alarmas, GE y consumo 
 	ev_pulsar_boton = svc_GE_reservar_ID();
+	rt_GE_iniciar(ev_pulsar_boton);                          //iniciamos FIFO, alarmas, GE y consumo 
 	drv_botones_iniciar(rt_FIFO_encolar, ev_pulsar_boton);
 	iniciarJuego(ev_pulsar_boton);
 	rt_GE_lanzador();                         
